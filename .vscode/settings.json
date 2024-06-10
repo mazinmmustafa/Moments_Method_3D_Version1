@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "ratio": "cpp",
+        "fstream": "cpp",
+        "*.ipp": "cpp",
+        "*.tcc": "cpp",
+        "complex": "cpp",
+        "chrono": "cpp",
+        "variant": "cpp",
+        "random": "cpp",
+        "limits": "cpp",
+        "valarray": "cpp",
+        "algorithm": "cpp"
+    }
+}

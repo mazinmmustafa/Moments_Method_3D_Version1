@@ -101,7 +101,7 @@ void test_read_write_binary_files(){
     print("I have found %zu samples:\n", Ns_);
     for (size_t i=0; i<Ns_; i++){
         file.read(&data);
-        // print(data);
+        print(data);
     }
     file.close();
 
@@ -110,54 +110,56 @@ void test_read_write_binary_files(){
 
 void test_matrix(){
 
-    matrix_t A, B;
+    matrix_t<real_t> A, B;
     A.set(3, 4);
     A.eye();
     A(0, 0) = -1.0;
-    // print(A);
+    A.disp();
 
     B.copy(&A);
-    print(B);
+    B.disp();
 
-    matrix_t C, D;
+    matrix_t<complex_t> C, D;
     C.set(100, 100);
     C.ones();
     C.save("data/matrix.bin");
     D.load("data/matrix.bin");
-    print(D);
+    D.disp();
 
     const size_t N=3;
     A.set(N, N);
     A(0, 0) = +0.0; A(0, 1) = +1.0; A(0, 2) = +2.0; 
     A(1, 0) = -4.0; A(1, 1) = +0.0; A(1, 2) = +0.0; 
     A(2, 0) = +6.0; A(2, 1) = +0.0; A(2, 2) = +1.0; 
-    matrix_t A_LUP;
+    matrix_t<real_t> A_LUP;
     A_LUP.copy(&A);
     A_LUP.lup();
     print("\n\n");
-    print(A_LUP);
+    A_LUP.disp();
 
-    matrix_t b, x;
+    matrix_t<real_t> b, x;
     x.set(3, 1);
     b.set(3, 1);
     b(0, 0) = +1.0; b(1, 0) = +1.0; b(2, 0) = +1.0;
     A_LUP.solve(b, x);
     print("\n\n");
-    print(x);
+    x.disp();
     print(A_LUP.det());
 
     A_LUP.inv();
     print("\n\n\n");
-    print(A_LUP);
+    A_LUP.disp();
 
     A.set(3, 3);
     B.set(3, 3);
-    C.set(3, 3);
+    matrix_t<real_t> C_;
+    C_.set(3, 3);
     A.ones();
     B.eye();
-    add_matrix(A, B, C);
+
+    add_matrix(A, B, C_);
     print("\n\n\n");
-    print(C);
+    C_.disp();
 }
 
 complex_t func_1d(const complex_t x, const real_t beta){
