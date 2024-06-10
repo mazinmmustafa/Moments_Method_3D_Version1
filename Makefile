@@ -2,7 +2,7 @@
 EXE = program.exe
 
 # Git Repositary
-GIT_URL = git@github.com:mazinmmustafa/test_library.git master
+GIT_URL = git@github.com:mazinmmustafa/Moments_Method_3D_Version1.git master
 
 # Compilers
 CXX = g++
