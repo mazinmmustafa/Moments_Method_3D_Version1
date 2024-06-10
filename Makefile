@@ -18,10 +18,11 @@ F77FLG =
 CLIB = -lgfortran -lquadmath -lm
 
 # Optimization
-OPT = -O2 -march=native -mtune=native
+OPT_LEVEL = -O2
+OPT = $(OPT_LEVEL) -march=native -mtune=native
 CXXOPT = $(OPT) 
 COPT = $(OPT) 
-F90OPT = -O2 
+F90OPT = $(OPT) 
 F77OPT = -O2 
 FLTO = -flto
 
@@ -101,9 +102,6 @@ git_push: clean_all clean_data
 
 git_pull:
 	git pull $(GIT_URL)
-
-debug:
-	@echo $(OS)
 
 # Includes
 -include $(CXXDEP) $(CDEP)
