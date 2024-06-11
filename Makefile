@@ -32,6 +32,7 @@ SDIR = src
 ODIR = .obj
 DDIR = .dep
 HDIR = include
+PDIR = data mesh
 
 # Variables
 CXXSRC = $(wildcard $(SDIR)/*.cpp)
@@ -51,7 +52,7 @@ CXXDEPFLG = -MMD -MF $(patsubst $(ODIR)/%.o, $(DDIR)/%.d, $@)
 # Targets
 .PHONY: build run clean clean_all
 
-build: $(BDIR) $(ODIR) $(DDIR) $(BDIR)/$(EXE) 
+build: $(BDIR) $(ODIR) $(DDIR) $(PDIR) $(BDIR)/$(EXE) 
 
 run: build
 	@echo executing $^:
@@ -64,6 +65,9 @@ $(ODIR):
 	@mkdir -pv $@
 
 $(DDIR): 
+	@mkdir -pv $@
+
+$(PDIR): 
 	@mkdir -pv $@
 
 $(BDIR)/$(EXE): $(CXXOBJ) $(COBJ) $(F90OBJ) $(F77OBJ)
