@@ -94,10 +94,12 @@ clean_all: clean
 clean_data:
 	@$(RM) -rv data/*
 
-.PHONY: valgrind
+.PHONY: valgrind 
 
 valgrind: build
 	valgrind --leak-check=full --track-origins=yes ./$(BDIR)/$(EXE) 
+
+.PHONY: git_push git_pull gmsh
 
 git_push: clean_all clean_data
 	git add .
@@ -107,5 +109,9 @@ git_push: clean_all clean_data
 git_pull:
 	git pull $(GIT_URL)
 
+gmsh:
+	@python3 mesh/generate_mesh.py
+
 # Includes
 -include $(CXXDEP) $(CDEP)
+

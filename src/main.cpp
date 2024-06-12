@@ -12,4 +12,6 @@ int main(){
 
     return 0;
 
+    // gmsh mesh/shape.geo -2 -clmax 0.05 -format stl -save_all -o mesh/shape.stl
+
 }
