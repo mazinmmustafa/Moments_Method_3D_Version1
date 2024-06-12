@@ -6,11 +6,12 @@ is_view = False
 # export .brep files from FreeCAD
 
 # filename_FreeCAD = "mesh/FreeCAD/sphere.brep"
-filename_FreeCAD = "mesh/FreeCAD/test_shape.brep"
+# filename_FreeCAD = "mesh/FreeCAD/test_shape.brep"
+filename_FreeCAD = "mesh/FreeCAD/test_shape_labels-GND.brep"
 
 filename_Mesh = "mesh/shape.vtk"
 
-mesh.call_gmsh(filename_FreeCAD, 3, 0.1)
+mesh.call_gmsh(filename_FreeCAD, 3, 2.0)
 if is_view:
     os.system(f"gmsh {filename_Mesh}")
     pass
