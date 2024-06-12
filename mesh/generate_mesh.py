@@ -4,7 +4,10 @@ import os
 is_view = False
 
 # export .brep files from FreeCAD
-filename_FreeCAD = "mesh/FreeCAD/sphere.brep"
+
+# filename_FreeCAD = "mesh/FreeCAD/sphere.brep"
+filename_FreeCAD = "mesh/FreeCAD/test_shape.brep"
+
 filename_Mesh = "mesh/shape.vtk"
 
 mesh.call_gmsh(filename_FreeCAD, 3, 0.08)
