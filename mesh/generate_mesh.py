@@ -10,7 +10,7 @@ filename_FreeCAD = "mesh/FreeCAD/test_shape.brep"
 
 filename_Mesh = "mesh/shape.vtk"
 
-mesh.call_gmsh(filename_FreeCAD, 3, 0.08)
+mesh.call_gmsh(filename_FreeCAD, 3, 0.1)
 if is_view:
     os.system(f"gmsh {filename_Mesh}")
     pass

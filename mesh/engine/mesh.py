@@ -173,6 +173,11 @@ def write_mesh(elements):
         file_data.write("{:d}\n".format(count_2d))
         file_data.write("{:d}\n".format(count_3d))
         file_data.close()
+        print("meshing completed successfully")
+        print(f"found {count_0d} 0d elements")
+        print(f"found {count_1d} 1d elements")
+        print(f"found {count_2d} 2d elements")
+        print(f"found {count_3d} 3d elements")
         pass
     except:
         print("error: unable to open file!")

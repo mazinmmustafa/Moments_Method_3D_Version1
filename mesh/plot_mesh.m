@@ -1,9 +1,9 @@
 close all; clear; clc;
 
-data_0d = importdata("mesh/mesh_0d.txt");
-data_1d = importdata("mesh/mesh_1d.txt");
-data_2d = importdata("mesh/mesh_2d.txt");
-data_3d = importdata("mesh/mesh_3d.txt");
+data_0d = load("mesh/mesh_0d.txt");
+data_1d = load("mesh/mesh_1d.txt");
+data_2d = load("mesh/mesh_2d.txt");
+data_3d = load("mesh/mesh_3d.txt");
 
 [N_0d, ~] = size(data_0d);
 [N_1d, ~] = size(data_1d);
