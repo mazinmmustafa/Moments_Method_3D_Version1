@@ -12,4 +12,6 @@ int main(){
 
     return 0;
 
+    // gmsh mesh/shape.geo -2 -format stl -save_all -o mesh/shape.stl
+
 }
