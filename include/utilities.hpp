@@ -9,7 +9,7 @@
 
 class range_t{
     private:
-        real_t *data=NULL;
+        real_t *data=null;
         real_t x_min=0.0, x_max=0.0;
         size_t Ns=0;
         int is_allocated=false;

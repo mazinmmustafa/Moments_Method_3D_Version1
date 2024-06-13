@@ -14,7 +14,7 @@ void file_t::open(const char *filename, const char mode){
         file_t::close();
     }
     this->filename = (char*)calloc(this->max_length, sizeof(char));
-    assert(this->filename!=NULL);
+    assert(this->filename!=null);
     strcpy(this->filename, filename);
     assert_error(mode=='r'||mode=='w'||mode=='a', "invalid file mode");
     this->mode = mode;
@@ -29,7 +29,7 @@ void file_t::open(const char *filename, const char mode){
         this->file_ptr = fopen(this->filename, "a");
         break;
     }
-    if (this->file_ptr==NULL){
+    if (this->file_ptr==null){
         assert_error(false, "failed to open file");
     }
     this->is_open = true;
@@ -82,7 +82,7 @@ void binary_file_t::open(const char *filename, const char mode){
         this->file_ptr = fopen(this->filename, "ab");
         break;
     }
-    if (this->file_ptr==NULL){
+    if (this->file_ptr==null){
         assert_error(false, "failed to open file");
     }
     this->is_open = true;

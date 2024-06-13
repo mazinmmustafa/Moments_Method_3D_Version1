@@ -21,9 +21,9 @@ void quadl_t::set(const size_t N, const size_t k_max, const real_t tol){
     this->N = N;
     this->k_max = k_max;
     this->x = (real_t*)calloc(this->N, sizeof(real_t));
-    assert(this->x!=NULL);
+    assert(this->x!=null);
     this->w = (real_t*)calloc(this->N, sizeof(real_t));
-    assert(this->w!=NULL);
+    assert(this->w!=null);
     int rule=1;
     int N_=this->N;
     cgqf_f77_(&rule, &N_, this->x, this->w);

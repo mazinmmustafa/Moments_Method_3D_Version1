@@ -97,7 +97,7 @@ void range_t::set(const real_t x_min, const real_t x_max, const size_t Ns){
     this->x_min = x_min;
     this->x_max = x_max;
     this->data = (real_t*)calloc(Ns, sizeof(real_t));
-    assert(this->data!=NULL);
+    assert(this->data!=null);
     this->is_allocated = true;
 }
 

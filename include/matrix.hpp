@@ -11,10 +11,10 @@ template <typename type_t>
 class matrix_t{
     private:
         size_t rows=0, cols=0;
-        type_t **data=NULL;
+        type_t **data=null;
         int is_allocated=false;
         int is_P_allocated=false;
-        size_t *P=NULL;
+        size_t *P=null;
     public:
         matrix_t(){}
         ~matrix_t(){
@@ -28,10 +28,10 @@ class matrix_t{
         this->rows = rows;
         this->cols = cols;
         this->data = (type_t**)calloc(this->rows, sizeof(type_t*));
-        assert(this->data!=NULL);
+        assert(this->data!=null);
         for (size_t i=0; i<this->rows; i++){
             this->data[i] = (type_t*)calloc(this->cols, sizeof(type_t));
-            assert(this->data[i]!=NULL);
+            assert(this->data[i]!=null);
         }
         this->is_allocated = true;
         matrix_t::zeros();
@@ -151,7 +151,7 @@ class matrix_t{
         size_t i_max, i_temp; 
         real_t max_element, abs_element;
         this->P=(size_t*)calloc((N+1), sizeof(size_t));
-        assert(this->P!=NULL);
+        assert(this->P!=null);
         for (size_t i=0; i<=N; i++){
             this->P[i]=i;
         }

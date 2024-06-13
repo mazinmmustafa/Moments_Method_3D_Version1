@@ -191,22 +191,22 @@ complex_t func_2d_wrapper(const complex_t x, const complex_t y, void *args_){
 }
 
 complex_t func_3d(const complex_t x, const complex_t y, const complex_t z, void *args){
-    assert(args==NULL);
+    assert(args==null);
     return x+0.0*(y+z);
 }; 
 
 complex_t func_1d_line(const complex_t x, void *args){
-    assert(args==NULL);
+    assert(args==null);
     return x-x*x+x*x*x;
 }; 
 
 complex_t func_2d_triangle(const complex_t x, const complex_t y, void *args){
-    assert(args==NULL);
+    assert(args==null);
     return x-x*x+y*y-y*y*y;
 }; 
 
 complex_t func_3d_tetrahedron(const complex_t x, const complex_t y, const complex_t z, void *args){
-    assert(args==NULL);
+    assert(args==null);
     return x-x*x+y*y+z*z*z;
 }; 
 
@@ -237,7 +237,7 @@ void test_quadl(){
     if(flag){print("I_2d: no convergence!\n");}
 
     // +3.14159265358979E+00
-    print(quadl.integral_3d(func_3d, NULL, 0.0, 1.0, 0.0, 2.0*pi, -0.5, +0.5, flag));  
+    print(quadl.integral_3d(func_3d, null, 0.0, 1.0, 0.0, 2.0*pi, -0.5, +0.5, flag));  
     if(flag){print("I_3d: no convergence!\n");}
 
     //
@@ -245,12 +245,12 @@ void test_quadl(){
     quadl_domain.set(2500, 1.0E-4);
 
     line_domain_t line={vector_t<real_t>(0.0, 0.0, 0.0), vector_t<real_t>(1.0, 0.0, 0.0)};
-    print(quadl_domain.integral_1d(func_1d_line, NULL, line, flag));
+    print(quadl_domain.integral_1d(func_1d_line, null, line, flag));
     if(flag){print("I_1d: no convergence!\n");}
 
     triangle_domain_t triangle={vector_t<real_t>(0.0, 0.0, 0.0), 
     vector_t<real_t>(1.0, 0.0, 0.0), vector_t<real_t>(0.0, 1.0, 0.0)};
-    print(quadl_domain.integral_2d(func_2d_triangle, NULL, triangle, flag));
+    print(quadl_domain.integral_2d(func_2d_triangle, null, triangle, flag));
     if(flag){print("I_2d: no convergence!\n");}
 
     tetrahedral_domain_t tetrahedron={
@@ -259,9 +259,17 @@ void test_quadl(){
         vector_t<real_t>(0.0, 1.0, 0.0),
         vector_t<real_t>(0.0, 0.0, 1.0)
     };
-    print(quadl_domain.integral_3d(func_3d_tetrahedron, NULL, tetrahedron, flag));
+    print(quadl_domain.integral_3d(func_3d_tetrahedron, null, tetrahedron, flag));
     if(flag){print("I_3d: no convergence!\n");}
     
+}
+
+void test_shape(){
+
+    shape_t shape;
+
+    
+
 }
 
 

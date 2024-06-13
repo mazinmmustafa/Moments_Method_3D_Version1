@@ -8,6 +8,8 @@
 #include "vector.hpp"
 #include "matrix.hpp"
 #include "quadl.hpp"
+//
+#include "shape.hpp"
 
 // Definitions
 
@@ -17,5 +19,6 @@ void test_vector();
 void test_read_write_binary_files();
 void test_matrix();
 void test_quadl();
+void test_shape();
 
 #endif

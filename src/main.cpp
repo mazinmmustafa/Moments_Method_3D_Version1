@@ -9,6 +9,7 @@ int main(){
     // test_read_write_binary_files();
     // test_matrix();
     // test_quadl();
+    test_shape();
 
     return 0;
 

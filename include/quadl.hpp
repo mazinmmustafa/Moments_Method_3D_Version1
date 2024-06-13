@@ -12,7 +12,7 @@ class quadl_t{
     private:
         size_t N=0;
         size_t k_max=0;
-        real_t *x=NULL, *w=NULL;
+        real_t *x=null, *w=null;
         int is_allocated=false;
         real_t tol=1.0E-4;
         //
