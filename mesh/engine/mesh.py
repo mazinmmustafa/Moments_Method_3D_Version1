@@ -17,6 +17,7 @@ class vertex:
 class element:
     def __init__(self):
         self.vertices = []
+        self.physical_group = 0
         pass
     def add_vertex(self, v):
         self.vertices.append(v)
@@ -40,13 +41,17 @@ def read_mesh(filename):
     text = text.splitlines()
     vertices = []
     elements = []
+    physical_groups = []
     i = 0
     i_break1 = 4
     i_break2 = 6
+    i_break3 = 7
     N_vertices = 0
     N_elements = 0
     flag1 = True
     flag2 = False
+    flag3= False
+    count = 0
     for line in text:
         if i==i_break1:
             N_vertices = int(line.split()[1])
@@ -78,8 +83,19 @@ def read_mesh(filename):
             elements.append(new_element)
             pass
         if flag2 and i==N_vertices+N_elements+i_break2:
-            break
+            flag2 = False
+            pass
+        if i==N_vertices+2*N_elements+i_break2+i_break3:
+            flag3 = True
+            pass
+        if flag3 and i>N_vertices+N_elements+i_break2+i_break3:
+            values = line.split()
+            physical_groups.append(int(values[0]))
+            count+=1
         i+=1
+        continue
+    for i in range(N_elements):
+        elements[i].physical_group = physical_groups[i]
         continue
     return elements
 
@@ -114,51 +130,61 @@ def write_mesh(elements):
         for element in elements:
             # 0d
             if len(element.vertices)==1:
-                file_0d.write("{:21.14E}, ".format(element.vertices[0].x))
-                file_0d.write("{:21.14E}, ".format(element.vertices[0].y))
-                file_0d.write("{:21.14E}\n".format(element.vertices[0].z))
+                file_0d.write("{:21.14E} ".format(element.vertices[0].x))
+                file_0d.write("{:21.14E} ".format(element.vertices[0].y))
+                file_0d.write("{:21.14E} ".format(element.vertices[0].z))
+                file_0d.write("{:d}\n".format(element.physical_group))
                 file_0d.write("\n")
                 count_0d+=1
                 pass
             # 1d
             if len(element.vertices)==2:
-                file_1d.write("{:21.14E}, ".format(element.vertices[0].x))
-                file_1d.write("{:21.14E}, ".format(element.vertices[0].y))
-                file_1d.write("{:21.14E}\n".format(element.vertices[0].z))
-                file_1d.write("{:21.14E}, ".format(element.vertices[1].x))
-                file_1d.write("{:21.14E}, ".format(element.vertices[1].y))
-                file_1d.write("{:21.14E}\n".format(element.vertices[1].z))
+                file_1d.write("{:21.14E} ".format(element.vertices[0].x))
+                file_1d.write("{:21.14E} ".format(element.vertices[0].y))
+                file_1d.write("{:21.14E} ".format(element.vertices[0].z))
+                file_1d.write("{:d}\n".format(element.physical_group))
+                file_1d.write("{:21.14E} ".format(element.vertices[1].x))
+                file_1d.write("{:21.14E} ".format(element.vertices[1].y))
+                file_1d.write("{:21.14E} ".format(element.vertices[1].z))
+                file_1d.write("{:d}\n".format(element.physical_group))
                 file_1d.write("\n")
                 count_1d+=1
                 pass
             # 2d
             if len(element.vertices)==3:
-                file_2d.write("{:21.14E}, ".format(element.vertices[0].x))
-                file_2d.write("{:21.14E}, ".format(element.vertices[0].y))
-                file_2d.write("{:21.14E}\n".format(element.vertices[0].z))
-                file_2d.write("{:21.14E}, ".format(element.vertices[1].x))
-                file_2d.write("{:21.14E}, ".format(element.vertices[1].y))
-                file_2d.write("{:21.14E}\n".format(element.vertices[1].z))
-                file_2d.write("{:21.14E}, ".format(element.vertices[2].x))
-                file_2d.write("{:21.14E}, ".format(element.vertices[2].y))
-                file_2d.write("{:21.14E}\n".format(element.vertices[2].z))
+                file_2d.write("{:21.14E} ".format(element.vertices[0].x))
+                file_2d.write("{:21.14E} ".format(element.vertices[0].y))
+                file_2d.write("{:21.14E} ".format(element.vertices[0].z))
+                file_2d.write("{:d}\n".format(element.physical_group))
+                file_2d.write("{:21.14E} ".format(element.vertices[1].x))
+                file_2d.write("{:21.14E} ".format(element.vertices[1].y))
+                file_2d.write("{:21.14E} ".format(element.vertices[1].z))
+                file_2d.write("{:d}\n".format(element.physical_group))
+                file_2d.write("{:21.14E} ".format(element.vertices[2].x))
+                file_2d.write("{:21.14E} ".format(element.vertices[2].y))
+                file_2d.write("{:21.14E} ".format(element.vertices[2].z))
+                file_2d.write("{:d}\n".format(element.physical_group))
                 file_2d.write("\n")
                 count_2d+=1
                 pass
             # 3d
             if len(element.vertices)==4:
-                file_3d.write("{:21.14E}, ".format(element.vertices[0].x))
-                file_3d.write("{:21.14E}, ".format(element.vertices[0].y))
-                file_3d.write("{:21.14E}\n".format(element.vertices[0].z))
-                file_3d.write("{:21.14E}, ".format(element.vertices[1].x))
-                file_3d.write("{:21.14E}, ".format(element.vertices[1].y))
-                file_3d.write("{:21.14E}\n".format(element.vertices[1].z))
-                file_3d.write("{:21.14E}, ".format(element.vertices[2].x))
-                file_3d.write("{:21.14E}, ".format(element.vertices[2].y))
-                file_3d.write("{:21.14E}\n".format(element.vertices[2].z))
-                file_3d.write("{:21.14E}, ".format(element.vertices[3].x))
-                file_3d.write("{:21.14E}, ".format(element.vertices[3].y))
-                file_3d.write("{:21.14E}\n".format(element.vertices[3].z))
+                file_3d.write("{:21.14E} ".format(element.vertices[0].x))
+                file_3d.write("{:21.14E} ".format(element.vertices[0].y))
+                file_3d.write("{:21.14E} ".format(element.vertices[0].z))
+                file_3d.write("{:d}\n".format(element.physical_group))
+                file_3d.write("{:21.14E} ".format(element.vertices[1].x))
+                file_3d.write("{:21.14E} ".format(element.vertices[1].y))
+                file_3d.write("{:21.14E} ".format(element.vertices[1].z))
+                file_3d.write("{:d}\n".format(element.physical_group))
+                file_3d.write("{:21.14E} ".format(element.vertices[2].x))
+                file_3d.write("{:21.14E} ".format(element.vertices[2].y))
+                file_3d.write("{:21.14E} ".format(element.vertices[2].z))
+                file_3d.write("{:d}\n".format(element.physical_group))
+                file_3d.write("{:21.14E} ".format(element.vertices[3].x))
+                file_3d.write("{:21.14E} ".format(element.vertices[3].y))
+                file_3d.write("{:21.14E} ".format(element.vertices[3].z))
+                file_3d.write("{:d}\n".format(element.physical_group))
                 file_3d.write("\n")
                 count_3d+=1
                 pass
