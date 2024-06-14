@@ -270,7 +270,7 @@ void test_shape(){
     shape.get_mesh();
     shape.load_mesh();
     shape.log_mesh();
-    enum physical_groups{PEC=41, Port=42, Substrate=43};  
+    enum physical_groups{PEC=1, Port=2, Substrate=3};  
 
 }
 
