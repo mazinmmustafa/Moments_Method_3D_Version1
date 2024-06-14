@@ -106,7 +106,7 @@ git_push: clean_all clean_data
 	git commit -m 'update' 
 	git push --force --set-upstream $(GIT_URL)
 
-git_pull:
+git_pull: clean_all
 	git pull $(GIT_URL)
 
 gmsh:

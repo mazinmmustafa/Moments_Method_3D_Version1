@@ -267,8 +267,8 @@ void test_quadl(){
 void test_shape(){
 
     shape_t shape;
-
-    
+    shape.load_mesh();
+    shape.log_mesh();
 
 }
 
