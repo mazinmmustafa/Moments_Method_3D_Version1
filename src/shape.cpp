@@ -97,7 +97,7 @@ void shape_t::load_mesh(){
     print("loading mesh information...");
     vector_t<real_t> v1, v2, v3, v4;
     int_t pg1, pg2, pg3, pg4;
-    triangle_t triagle;
+    triangle_t triangle;
     tetrahedron_t tetrahedron;
     file.open("mesh/mesh/mesh_2d.txt", 'r');
     for (size_t i=0; i<this->N_triangles; i++){
@@ -105,10 +105,11 @@ void shape_t::load_mesh(){
         file.read("%lf %lf %lf %d\n", &v2.x, &v2.y, &v2.z, &pg2);
         file.read("%lf %lf %lf %d\n", &v3.x, &v3.y, &v3.z, &pg3);
         file.read("\n");
-        triagle.v1 = v1; triagle.v2 = v2; triagle.v3 = v3; triagle.get_area();
+        triangle.v1 = v1; triangle.v2 = v2; triangle.v3 = v3; triangle.get_area();
+        assert_error(triangle.area>0.0, "invalid triangle element");
         assert_error((pg1==pg2)&&(pg2==pg3), "invalid physical groups");
-        triagle.physical_group = pg1;
-        this->triangle_data[i] = triagle;
+        triangle.physical_group = pg1;
+        this->triangle_data[i] = triangle;
     }
     file.close();
     file.open("mesh/mesh/mesh_3d.txt", 'r');
@@ -120,8 +121,9 @@ void shape_t::load_mesh(){
         file.read("\n");
         tetrahedron.v1 = v1; tetrahedron.v2 = v2; tetrahedron.v3 = v3; tetrahedron.v4 = v4;
         tetrahedron.get_volume();
+        assert_error(tetrahedron.volume>0.0, "invalid tetrahedron element");
         assert_error((pg1==pg2)&&(pg2==pg3)&&(pg3==pg4), "invalid physical groups");
-        triagle.physical_group = pg1;
+        triangle.physical_group = pg1;
         this->tetrahedron_data[i] = tetrahedron;
     }
     file.close();
