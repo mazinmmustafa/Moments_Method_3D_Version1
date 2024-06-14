@@ -269,6 +269,7 @@ void test_shape(){
     shape_t shape;
     shape.load_mesh();
     shape.log_mesh();
+    enum physical_groups{PEC=41, Port=42, Substrate=43};  
 
 }
 
