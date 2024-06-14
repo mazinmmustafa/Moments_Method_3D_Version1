@@ -11,10 +11,10 @@
 
 struct edge_t{
     vector_t<real_t> v1, v2;
-    size_t physical_group=0;
+    int_t physical_group=0;
     real_t length=0.0;
     edge_t(){}
-    edge_t(const vector_t<real_t> v1, const vector_t<real_t> v2, const size_t physical_group){
+    edge_t(const vector_t<real_t> v1, const vector_t<real_t> v2, const int_t physical_group){
         this->v1 = v1;
         this->v2 = v2;
         get_length();
@@ -27,12 +27,12 @@ struct edge_t{
 
 struct triangle_t{
     vector_t<real_t> v1, v2, v3, v4;
-    size_t physical_group=0;
+    int_t physical_group=0;
     real_t area=0.0;
     vector_t<real_t> n;
     triangle_t(){}
     triangle_t(const vector_t<real_t> v1, const vector_t<real_t> v2, 
-        const vector_t<real_t> v3, const size_t physical_group){
+        const vector_t<real_t> v3, const int_t physical_group){
         this->v1 = v1;
         this->v2 = v2;
         this->v3 = v3;
@@ -49,9 +49,10 @@ struct tetrahedron_t{
     vector_t<real_t> v1, v2, v3, v4;
     int_t physical_group=0;
     real_t volume=0.0;
+    complex_t eps=1.0;
     tetrahedron_t(){}
     tetrahedron_t(const vector_t<real_t> v1, const vector_t<real_t> v2, 
-        const vector_t<real_t> v3, const vector_t<real_t> v4, const size_t physical_group){
+        const vector_t<real_t> v3, const vector_t<real_t> v4, const int_t physical_group){
         this->v1 = v1;
         this->v2 = v2;
         this->v3 = v3;
@@ -81,6 +82,7 @@ class shape_t{
         void log_mesh();
         triangle_t get_triangle_element(const size_t index);
         tetrahedron_t get_tetrahedron_element(const size_t index);
+        void assign_volume_properties(const complex_t eps, const int_t physical_group);
 };
 
 // Functions

@@ -123,7 +123,7 @@ void shape_t::load_mesh(){
         tetrahedron.get_volume();
         assert_error(tetrahedron.volume>0.0, "invalid tetrahedron element");
         assert_error((pg1==pg2)&&(pg2==pg3)&&(pg3==pg4), "invalid physical groups");
-        triangle.physical_group = pg1;
+        tetrahedron.physical_group = pg1;
         this->tetrahedron_data[i] = tetrahedron;
     }
     file.close();
@@ -144,8 +144,17 @@ void shape_t::get_mesh(){
     int_t return_value;
     #ifdef __windows__
         return_value = system("python mesh/generate_mesh.py");
-    #else
+    #endif
+    #ifdef __linux__
         return_value = system("python3 mesh/generate_mesh.py");
     #endif
     assert_error(return_value==0, "failed to call python");
+}
+
+void shape_t::assign_volume_properties(const complex_t eps, const int_t physical_group){
+    for (size_t i=0; i<this->N_tetrahedrons; i++){
+        if (this->tetrahedron_data[i].physical_group==physical_group){
+            this->tetrahedron_data[i].eps = eps;
+        }
+    }
 }
