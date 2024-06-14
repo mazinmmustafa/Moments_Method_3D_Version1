@@ -267,6 +267,7 @@ void test_quadl(){
 void test_shape(){
 
     shape_t shape;
+    shape.get_mesh();
     shape.load_mesh();
     shape.log_mesh();
     enum physical_groups{PEC=41, Port=42, Substrate=43};  

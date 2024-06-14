@@ -76,6 +76,7 @@ class shape_t{
     public:
         shape_t();
         ~shape_t();
+        void get_mesh();
         void load_mesh();
         void log_mesh();
         triangle_t get_triangle_element(const size_t index);

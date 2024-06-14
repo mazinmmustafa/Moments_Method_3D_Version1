@@ -139,3 +139,13 @@ tetrahedron_t shape_t::get_tetrahedron_element(const size_t index){
     assert_error(index<this->N_tetrahedrons, "tetrahedron index is out of range");
     return this->tetrahedron_data[index];
 }
+
+void shape_t::get_mesh(){
+    int_t return_value;
+    #ifdef __windows__
+        return_value = system("python mesh/generate_mesh.py");
+    #else
+        return_value = system("python3 mesh/generate_mesh.py");
+    #endif
+    assert_error(return_value==0, "failed to call python");
+}

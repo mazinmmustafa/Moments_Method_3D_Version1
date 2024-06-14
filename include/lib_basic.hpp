@@ -19,6 +19,10 @@
 #define false 0
 #define null NULL
 
+#ifdef _WIN64
+#define __windows__
+#endif
+
 #define int_t int32_t
 #define real_t double 
 #ifndef real_t

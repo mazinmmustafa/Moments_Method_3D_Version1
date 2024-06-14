@@ -55,7 +55,7 @@ def read_mesh(filename):
     for line in text:
         if i==i_break1:
             N_vertices = int(line.split()[1])
-            print(f"found {N_vertices} vertices..., done!")
+            print(f"expecting {N_vertices} vertices...")
             pass
         if flag1 and i>i_break1:
             values = line.split()
@@ -66,7 +66,7 @@ def read_mesh(filename):
             flag1 = False
         if i==N_vertices+i_break2:
             N_elements = int(line.split()[1])
-            print(f"found {N_elements} elements..., done!")
+            print(f"expecting {N_elements} elements...")
             flag2 = True
             pass
         if flag2 and i>N_vertices+i_break2:
@@ -199,11 +199,12 @@ def write_mesh(elements):
         file_data.write("{:d}\n".format(count_2d))
         file_data.write("{:d}\n".format(count_3d))
         file_data.close()
-        print("meshing completed successfully")
+        print("reading mesh file...")
         print(f"found {count_0d} 0d elements")
         print(f"found {count_1d} 1d elements")
         print(f"found {count_2d} 2d elements")
         print(f"found {count_3d} 3d elements")
+        print("done!")
         pass
     except:
         print("error: unable to open file!")
