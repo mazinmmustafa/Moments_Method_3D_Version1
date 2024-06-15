@@ -276,7 +276,6 @@ void test_shape(){
     shape.assign_volume_properties(eps_substrate, substrate);
 
 
-
 }
 
 
