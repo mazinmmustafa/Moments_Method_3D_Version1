@@ -24,13 +24,8 @@
 #endif
 
 #define int_t int32_t
-#define real_t double 
-#ifndef real_t
-#define real_t float
-#endif
-
+typedef double real_t;
 #define complex_t std::complex<real_t>
-#define pi 3.141592653589793E0
 #include "physics_constants.hpp"
 
 // Functions

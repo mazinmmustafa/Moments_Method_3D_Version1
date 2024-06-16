@@ -5,6 +5,8 @@
 #include "lib_basic.hpp"
 
 // Constants
+const real_t pi=3.141592653589793E0;
+
 const real_t h_bar=6.582119569E-16; // eV.s
 const real_t q_e=1.602176634E-19; // C
 const real_t m_e=9.1093837139E-31; // kg

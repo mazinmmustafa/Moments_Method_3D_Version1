@@ -17,7 +17,7 @@ void print(const size_t n){
 }
 
 void print(const real_t x){
-    print("%21.14E\n", x);
+    print("%21.14E\n", (real_t)x);
 }
 
 void print(const complex_t z){

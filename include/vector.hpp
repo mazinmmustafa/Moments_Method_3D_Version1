@@ -13,7 +13,7 @@ class vector_t{
         type_t x=(type_t)0.0, y=(type_t)0.0, z=(type_t)0.0;
         vector_t(){}
         ~vector_t(){}
-        vector_t(type_t x, type_t y, type_t z){
+        vector_t(const type_t x, const type_t y, const type_t z){
             this->x = x;
             this->y = y;
             this->z = z;
@@ -21,8 +21,8 @@ class vector_t{
 };
 
 // Functions
-void print(vector_t<complex_t> A);
-void print(vector_t<real_t> A);
+void print(const vector_t<complex_t> A);
+void print(const vector_t<real_t> A);
 
 vector_t<complex_t> operator + (const vector_t<complex_t> A, const vector_t<complex_t> B);
 vector_t<real_t> operator + (const vector_t<real_t> A, const vector_t<real_t> B);

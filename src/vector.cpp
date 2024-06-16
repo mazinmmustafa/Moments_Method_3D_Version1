@@ -1,15 +1,15 @@
 //
 #include "vector.hpp"
 
-void print(vector_t<complex_t> A){
+void print(const vector_t<complex_t> A){
     printf("(%21.14E, %21.14E),\n(%21.14E, %21.14E),\n(%21.14E, %21.14E)\n",
-        real(A.x), imag(A.x), 
-        real(A.y), imag(A.y), 
-        real(A.z), imag(A.z));
+        (real_t)real(A.x), (real_t)imag(A.x), 
+        (real_t)real(A.y), (real_t)imag(A.y), 
+        (real_t)real(A.z), (real_t)imag(A.z));
 }
 
-void print(vector_t<real_t> A){
-    printf("(%21.14E, %21.14E, %21.14E)\n", A.x, A.y, A.z);
+void print(const vector_t<real_t> A){
+    printf("(%21.14E, %21.14E, %21.14E)\n", (real_t)A.x, (real_t)A.y, (real_t)A.z);
 }
 
 vector_t<complex_t> operator + (const vector_t<complex_t> A, const vector_t<complex_t> B){
