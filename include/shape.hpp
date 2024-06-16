@@ -65,6 +65,12 @@ struct tetrahedron_t{
     }
 };
 
+class basis_2d_t{
+    private:
+    public:
+
+};
+
 class shape_t{
     private:
         size_t N_points=0, N_edges=0, N_triangles=0, N_tetrahedrons=0;

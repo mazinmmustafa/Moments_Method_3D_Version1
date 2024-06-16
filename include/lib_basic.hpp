@@ -24,7 +24,7 @@
 #endif
 
 #define int_t int32_t
-typedef double real_t;
+#define real_t double
 #define complex_t std::complex<real_t>
 #include "physics_constants.hpp"
 
