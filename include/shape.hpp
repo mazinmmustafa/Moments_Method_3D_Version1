@@ -65,10 +65,8 @@ struct tetrahedron_t{
     }
 };
 
-class basis_2d_t{
-    private:
-    public:
-
+struct basis_2d_t{
+    
 };
 
 class shape_t{
