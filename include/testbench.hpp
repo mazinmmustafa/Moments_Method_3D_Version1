@@ -10,6 +10,7 @@
 #include "quadl.hpp"
 //
 #include "shape.hpp"
+#include "engine.hpp"
 
 // Definitions
 

@@ -16,6 +16,9 @@ void shape_t::unset(){
     if (this->is_tetrahedron_allocated){
         free(this->tetrahedron_data);
     }
+    if (this->is_basis_2d_list_allocated){
+        free(this->basis_2d_list);
+    }
     this->N_points = 0;
     this->N_edges = 0;
     this->N_triangles = 0;
@@ -157,4 +160,141 @@ void shape_t::assign_volume_properties(const complex_t eps, const int_t physical
             this->tetrahedron_data[i].eps = eps;
         }
     }
+}
+
+void print_log(const triangle_t tri_s, const triangle_t tri_d){
+    print("I found basis:\n");
+    print(tri_s.v1);
+    print(tri_s.v2);
+    print(tri_s.v3);
+    print(tri_d.v1);
+    print(tri_d.v2);
+    print(tri_d.v3);
+    print("\n");
+}
+
+void shape_t::get_basis_functions(){
+    assert_error(this->is_triangle_allocated, "no 2d shape elements were found");
+    assert_error(!this->is_basis_2d_list_allocated, "2d basis functions were already allocated");
+    file_t file;
+    file.open("mesh/basis/basis_2d.txt", 'w');
+    vector_t<real_t> v1_s, v2_s, v3_s, v1_d, v2_d, v3_d;
+    triangle_t triangle_s, triangle_d;
+    for (size_t i=0; i<this->N_triangles; i++){
+        v1_s = this->triangle_data[i].v1;
+        v2_s = this->triangle_data[i].v2;
+        v3_s = this->triangle_data[i].v3;
+        triangle_s = this->triangle_data[i];
+        for (size_t j=(i+1); j<this->N_triangles; j++){
+            v1_d = this->triangle_data[j].v1;
+            v2_d = this->triangle_data[j].v2;
+            v3_d = this->triangle_data[j].v3;
+            triangle_d = this->triangle_data[j];
+            // group 1
+            if (is_equal(v2_s, v2_d, tol_vertex)&&is_equal(v3_s, v1_d, tol_vertex)){
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v1.x, triangle_s.v1.y, triangle_s.v1.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v2.x, triangle_s.v2.y, triangle_s.v2.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_d.v3.x, triangle_d.v3.y, triangle_d.v3.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v3.x, triangle_s.v3.y, triangle_s.v3.z);
+                file.write("%d %zu\n", triangle_s.physical_group, triangle_d.physical_group);
+                triangle_s.N_adjacents++;
+                triangle_d.N_adjacents++;
+                this->N_2d_basis++;
+            }
+            //
+            if (is_equal(v2_s, v1_d, tol_vertex)&&is_equal(v3_s, v3_d, tol_vertex)){
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v1.x, triangle_s.v1.y, triangle_s.v1.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v2.x, triangle_s.v2.y, triangle_s.v2.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_d.v2.x, triangle_d.v2.y, triangle_d.v2.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v3.x, triangle_s.v3.y, triangle_s.v3.z);
+                file.write("%d %zu\n", triangle_s.physical_group, triangle_d.physical_group);
+                triangle_s.N_adjacents++;
+                triangle_d.N_adjacents++;
+                this->N_2d_basis++;
+            }
+            // 
+            if (is_equal(v2_s, v3_d, tol_vertex)&&is_equal(v3_s, v2_d, tol_vertex)){
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v1.x, triangle_s.v1.y, triangle_s.v1.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v2.x, triangle_s.v2.y, triangle_s.v2.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_d.v1.x, triangle_d.v1.y, triangle_d.v1.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v3.x, triangle_s.v3.y, triangle_s.v3.z);
+                file.write("%d %zu\n", triangle_s.physical_group, triangle_d.physical_group);
+                triangle_s.N_adjacents++;
+                triangle_d.N_adjacents++;
+                this->N_2d_basis++;
+            }
+            // group 2
+            if (is_equal(v3_s, v3_d, tol_vertex)&&is_equal(v1_s, v2_d, tol_vertex)){
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v2.x, triangle_s.v2.y, triangle_s.v2.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v3.x, triangle_s.v3.y, triangle_s.v3.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_d.v1.x, triangle_d.v1.y, triangle_d.v1.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v1.x, triangle_s.v1.y, triangle_s.v1.z);
+                file.write("%d %zu\n", triangle_s.physical_group, triangle_d.physical_group);
+                triangle_s.N_adjacents++;
+                triangle_d.N_adjacents++;
+                this->N_2d_basis++;
+            }
+            //
+            if (is_equal(v3_s, v2_d, tol_vertex)&&is_equal(v1_s, v1_d, tol_vertex)){
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v2.x, triangle_s.v2.y, triangle_s.v2.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v3.x, triangle_s.v3.y, triangle_s.v3.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_d.v3.x, triangle_d.v3.y, triangle_d.v3.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v1.x, triangle_s.v1.y, triangle_s.v1.z);
+                file.write("%d %zu\n", triangle_s.physical_group, triangle_d.physical_group);
+                triangle_s.N_adjacents++;
+                triangle_d.N_adjacents++;
+                this->N_2d_basis++;
+            }
+            //
+            if (is_equal(v3_s, v1_d, tol_vertex)&&is_equal(v1_s, v3_d, tol_vertex)){
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v2.x, triangle_s.v2.y, triangle_s.v2.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v3.x, triangle_s.v3.y, triangle_s.v3.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_d.v2.x, triangle_d.v2.y, triangle_d.v2.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v1.x, triangle_s.v1.y, triangle_s.v1.z);
+                file.write("%d %zu\n", triangle_s.physical_group, triangle_d.physical_group);
+                triangle_s.N_adjacents++;
+                triangle_d.N_adjacents++;
+                this->N_2d_basis++;
+            }
+            // group 3
+            if (is_equal(v1_s, v1_d, tol_vertex)&&is_equal(v2_s, v3_d, tol_vertex)){
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v3.x, triangle_s.v3.y, triangle_s.v3.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v1.x, triangle_s.v1.y, triangle_s.v1.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_d.v2.x, triangle_d.v2.y, triangle_d.v2.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v2.x, triangle_s.v2.y, triangle_s.v2.z);
+                file.write("%d %zu\n", triangle_s.physical_group, triangle_d.physical_group);
+                triangle_s.N_adjacents++;
+                triangle_d.N_adjacents++;
+                this->N_2d_basis++;
+            }
+            //
+            if (is_equal(v1_s, v3_d, tol_vertex)&&is_equal(v2_s, v2_d, tol_vertex)){
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v3.x, triangle_s.v3.y, triangle_s.v3.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v1.x, triangle_s.v1.y, triangle_s.v1.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_d.v1.x, triangle_d.v1.y, triangle_d.v1.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v2.x, triangle_s.v2.y, triangle_s.v2.z);
+                file.write("%d %zu\n", triangle_s.physical_group, triangle_d.physical_group);
+                triangle_s.N_adjacents++;
+                triangle_d.N_adjacents++;
+                this->N_2d_basis++;
+            }
+            //
+            if (is_equal(v1_s, v2_d, tol_vertex)&&is_equal(v2_s, v1_d, tol_vertex)){
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v3.x, triangle_s.v3.y, triangle_s.v3.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v1.x, triangle_s.v1.y, triangle_s.v1.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_d.v3.x, triangle_d.v3.y, triangle_d.v3.z);
+                file.write("%21.14E %21.14E %21.14E ", triangle_s.v2.x, triangle_s.v2.y, triangle_s.v2.z);
+                file.write("%d %zu\n", triangle_s.physical_group, triangle_d.physical_group);
+                triangle_s.N_adjacents++;
+                triangle_d.N_adjacents++;
+                this->N_2d_basis++;
+            }
+        }
+        print_log(triangle_s, triangle_d);
+        char message[100];
+        sprintf(message, "invalid triangle %zu found", i);
+        assert_error(triangle_s.N_adjacents>0&&triangle_s.N_adjacents<4, message);
+    }
+
+    file.close();
 }

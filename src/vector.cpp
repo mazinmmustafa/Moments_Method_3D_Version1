@@ -92,3 +92,11 @@ vector_t<real_t> unit(const vector_t<real_t> A){
     real_t A_mag=mag(A);
     return vector_t<real_t>(A.x/A_mag, A.y/A_mag, A.z/A_mag);
 }
+
+int is_equal(const vector_t<real_t> A, const vector_t<real_t> B, const real_t tol){
+    if (abs(A.x-B.x)<=abs(tol) && abs(A.y-B.y)<=abs(tol) && abs(A.z-B.z)<=abs(tol)){
+        return true;
+    }else{
+        return false;
+    }
+}

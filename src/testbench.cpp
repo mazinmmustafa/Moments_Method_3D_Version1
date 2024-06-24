@@ -275,6 +275,7 @@ void test_shape(){
     const complex_t eps_substrate=4.3;
     shape.assign_volume_properties(eps_substrate, substrate);
 
+    shape.get_basis_functions();
 
 }
 

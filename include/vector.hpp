@@ -51,4 +51,6 @@ vector_t<real_t> operator / (const vector_t<real_t> A, const real_t a);
 real_t mag(const vector_t<real_t> A);
 vector_t<real_t> unit(const vector_t<real_t> A);
 
+int is_equal(const vector_t<real_t> A, const vector_t<real_t> B, const real_t tol);
+
 #endif
