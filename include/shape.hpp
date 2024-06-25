@@ -72,42 +72,42 @@ struct tetrahedron_t{
 };
 
 struct basis_1d_t{
-    vector_t<real_t> r_m, r_p;
-    real_t l;
-    vector_t<real_t> L;
+    vector_t<real_t> r_m, r_p, e_1;
+    vector_t<real_t> L_m, L_p;
     int_t physical_group_m=0, physical_group_p=0;
     basis_1d_t(){}
-    basis_1d_t(const vector_t<real_t> r_m, const vector_t<real_t> r_p){
+    basis_1d_t(const vector_t<real_t> r_m, const vector_t<real_t> r_p, const vector_t<real_t> e_1){
         this->r_m = r_m;
         this->r_p = r_p;
+        this->e_1 = e_1;
         basis_1d_t::get_values();
     }
     void get_values(){
-        this->L = +1.0*(this->r_p-this->r_m);
-        this->l = mag(this->L);
+        this->L_m = +1.0*(e_1-r_m);
+        this->L_p = -1.0*(e_1-r_p);
     }
 };
 
 struct basis_2d_t{
-    vector_t<real_t> r_m, r_p, e1, e2, n_m, n_p;
+    vector_t<real_t> r_m, r_p, e_1, e_2, n_m, n_p;
     real_t L, A_m, A_p;
     vector_t<real_t> L_m1, L_m2, L_p1, L_p2;
     int_t physical_group_m=0, physical_group_p=0;
     basis_2d_t(){}
     basis_2d_t(const vector_t<real_t> r_m, const vector_t<real_t> r_p, 
-        const vector_t<real_t> e1, const vector_t<real_t> e2){
+        const vector_t<real_t> e_1, const vector_t<real_t> e_2){
         this->r_m = r_m;
         this->r_p = r_p;
-        this->e1 = e1;
-        this->e2 = e2;
+        this->e_1 = e_1;
+        this->e_2 = e_2;
         basis_2d_t::get_values();
     }
     void get_values(){
-        this->L_m1 = +1.0*(e1-r_m);
-        this->L_m2 = +1.0*(e2-r_m);
-        this->L_p1 = -1.0*(e1-r_p);
-        this->L_p2 = -1.0*(e2-r_p);
-        this->L = mag(e1-e2);
+        this->L_m1 = +1.0*(e_1-r_m);
+        this->L_m2 = +1.0*(e_2-r_m);
+        this->L_p1 = -1.0*(e_1-r_p);
+        this->L_p2 = -1.0*(e_2-r_p);
+        this->L = mag(e_1-e_2);
         this->A_m = mag(L_m1^L_m2)/2.0;
         this->A_p = mag(L_p1^L_p2)/2.0;
         this->n_m = unit(L_m1^L_m2);
@@ -116,30 +116,30 @@ struct basis_2d_t{
 };
 
 struct basis_3d_t{
-    vector_t<real_t> r_m, r_p, e1, e2, e3;
+    vector_t<real_t> r_m, r_p, e_1, e_2, e_3;
     vector_t<real_t> n, n_m1, n_m2, n_m3, n_p1, n_p2, n_p3;
     real_t A, V_m, V_p;
     vector_t<real_t> L_m1, L_m2, L_m3, L_p1, L_p2, L_p3;
     int_t physical_group_m=0, physical_group_p=0;
     basis_3d_t(){}
     basis_3d_t(const vector_t<real_t> r_m, const vector_t<real_t> r_p, 
-        const vector_t<real_t> e1, const vector_t<real_t> e2, const vector_t<real_t> e3){
+        const vector_t<real_t> e_1, const vector_t<real_t> e_2, const vector_t<real_t> e_3){
         this->r_m = r_m;
         this->r_p = r_p;
-        this->e1 = e1;
-        this->e2 = e2;
-        this->e3 = e3;
+        this->e_1 = e_1;
+        this->e_2 = e_2;
+        this->e_3 = e_3;
         basis_3d_t::get_values();
     }
     void get_values(){
-        this->L_m1 = +1.0*(this->e1-this->r_m);
-        this->L_m2 = +1.0*(this->e2-this->r_m);
-        this->L_m3 = +1.0*(this->e3-this->r_m);
-        this->L_p1 = -1.0*(this->e1-this->r_p);
-        this->L_p2 = -1.0*(this->e2-this->r_p);
-        this->L_p3 = -1.0*(this->e3-this->r_p);
+        this->L_m1 = +1.0*(this->e_1-this->r_m);
+        this->L_m2 = +1.0*(this->e_2-this->r_m);
+        this->L_m3 = +1.0*(this->e_3-this->r_m);
+        this->L_p1 = -1.0*(this->e_1-this->r_p);
+        this->L_p2 = -1.0*(this->e_2-this->r_p);
+        this->L_p3 = -1.0*(this->e_3-this->r_p);
         vector_t<real_t> vector;
-        vector=(e2-e1)^(e3-e1);
+        vector=(e_2-e_1)^(e_3-e_1);
         this->A = mag(vector)/2.0;
         this->V_m = +1.0*(L_m1^L_m2)*L_m3/6.0;
         this->V_p = -1.0*(L_p1^L_p2)*L_p3/6.0;
@@ -164,6 +164,7 @@ class shape_t{
         basis_1d_t *basis_1d_list=null;
         basis_2d_t *basis_2d_list=null;
         basis_3d_t *basis_3d_list=null;
+        void free_basic_elements();
     public:
         shape_t();
         ~shape_t();
@@ -174,6 +175,7 @@ class shape_t{
         tetrahedron_t get_tetrahedron_element(const size_t index);
         void assign_volume_properties(const complex_t eps, const int_t physical_group);
         void get_basis_functions();
+        void load_basis_functions();
 };
 
 // Functions

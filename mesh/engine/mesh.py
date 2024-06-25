@@ -204,7 +204,6 @@ def write_mesh(elements):
         print(f"found {count_1d} 1d elements")
         print(f"found {count_2d} 2d elements")
         print(f"found {count_3d} 3d elements")
-        print("done!")
         pass
     except:
         print("error: unable to open file!")

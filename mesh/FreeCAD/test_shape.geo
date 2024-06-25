@@ -1,3 +1,5 @@
 Merge "test_shape.brep";
 //+
-Physical Surface("Sphere", 1) = {1};
+Physical Surface("Surface", 1) = {1};
+//+
+Physical Volume("Volume", 2) = {1};

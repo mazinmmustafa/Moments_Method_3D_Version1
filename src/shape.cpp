@@ -19,8 +19,14 @@ void shape_t::unset(){
     if (this->is_tetrahedron_allocated){
         free(this->tetrahedron_data);
     }
+    if (this->is_basis_1d_list_allocated){
+        free(this->basis_1d_list);
+    }
     if (this->is_basis_2d_list_allocated){
         free(this->basis_2d_list);
+    }
+    if (this->is_basis_3d_list_allocated){
+        free(this->basis_3d_list);
     }
     this->N_points = 0;
     this->N_edges = 0;
@@ -185,7 +191,6 @@ void shape_t::assign_volume_properties(const complex_t eps, const int_t physical
 size_t mod_1d(const size_t a){
     return a==1 ? 0 : 1;
 }
-
 
 size_t mod_2d(const size_t a){
     size_t ans=3-(size_t)(a%3);
@@ -377,5 +382,96 @@ void shape_t::get_basis_functions(){
     print(this->N_1d_basis+this->N_2d_basis+this->N_3d_basis);
     file.open("mesh/basis/basis_info.txt", 'w');
     file.write("%zu\n%zu\n%zu", this->N_1d_basis, this->N_2d_basis, this->N_3d_basis);
+    file.close();
+    shape_t::free_basic_elements();
+}
+
+void shape_t::free_basic_elements(){
+    free(this->edge_data); 
+    this->is_edge_allocated = false;
+    free(this->triangle_data); 
+    this->is_triangle_allocated = false;
+    free(this->tetrahedron_data); 
+    this->is_tetrahedron_allocated = false;
+}
+
+void shape_t::load_basis_functions(){   
+    this->basis_1d_list = (basis_1d_t*)calloc(this->N_1d_basis, sizeof(basis_1d_t));
+    this->basis_2d_list = (basis_2d_t*)calloc(this->N_2d_basis, sizeof(basis_2d_t));
+    this->basis_3d_list = (basis_3d_t*)calloc(this->N_3d_basis, sizeof(basis_3d_t));
+    assert(this->basis_1d_list!=null);
+    assert(this->basis_2d_list!=null);
+    assert(this->basis_3d_list!=null);
+    this->is_basis_1d_list_allocated = true;
+    this->is_basis_2d_list_allocated = true;
+    this->is_basis_3d_list_allocated = true;
+    basis_2d_t basis_2d;
+    basis_3d_t basis_3d;
+    file_t file;
+    //
+    file.open("mesh/basis/basis_1d.txt", 'r');
+    for (size_t i=0; i<this->N_1d_basis; i++){
+        basis_1d_t basis_1d;
+        file.read("%lf", &basis_1d.r_m.x);
+        file.read("%lf", &basis_1d.r_m.y);
+        file.read("%lf", &basis_1d.r_m.z);
+        file.read("%lf", &basis_1d.e_1.x);
+        file.read("%lf", &basis_1d.e_1.y);
+        file.read("%lf", &basis_1d.e_1.z);
+        file.read("%lf", &basis_1d.r_p.x);
+        file.read("%lf", &basis_1d.r_p.y);
+        file.read("%lf", &basis_1d.r_p.z);
+        file.read("%d", &basis_1d.physical_group_m);
+        file.read("%d", &basis_1d.physical_group_p);
+        basis_1d.get_values();
+        this->basis_1d_list[i] = basis_1d;
+    }
+    file.close();
+    //
+    file.open("mesh/basis/basis_2d.txt", 'r');
+    for (size_t i=0; i<this->N_2d_basis; i++){
+        basis_2d_t basis_2d;
+        file.read("%lf", &basis_2d.r_m.x);
+        file.read("%lf", &basis_2d.r_m.y);
+        file.read("%lf", &basis_2d.r_m.z);
+        file.read("%lf", &basis_2d.e_1.x);
+        file.read("%lf", &basis_2d.e_1.y);
+        file.read("%lf", &basis_2d.e_1.z);
+        file.read("%lf", &basis_2d.e_2.x);
+        file.read("%lf", &basis_2d.e_2.y);
+        file.read("%lf", &basis_2d.e_2.z);
+        file.read("%lf", &basis_2d.r_p.x);
+        file.read("%lf", &basis_2d.r_p.y);
+        file.read("%lf", &basis_2d.r_p.z);
+        file.read("%d", &basis_2d.physical_group_m);
+        file.read("%d", &basis_2d.physical_group_p);
+        basis_2d.get_values();
+        this->basis_2d_list[i] = basis_2d;
+    }
+    file.close();
+    //
+    file.open("mesh/basis/basis_3d.txt", 'r');
+    for (size_t i=0; i<this->N_3d_basis; i++){
+        basis_3d_t basis_3d;
+        file.read("%lf", &basis_3d.r_m.x);
+        file.read("%lf", &basis_3d.r_m.y);
+        file.read("%lf", &basis_3d.r_m.z);
+        file.read("%lf", &basis_3d.e_1.x);
+        file.read("%lf", &basis_3d.e_1.y);
+        file.read("%lf", &basis_3d.e_1.z);
+        file.read("%lf", &basis_3d.e_2.x);
+        file.read("%lf", &basis_3d.e_2.y);
+        file.read("%lf", &basis_3d.e_2.z);
+        file.read("%lf", &basis_3d.e_3.x);
+        file.read("%lf", &basis_3d.e_3.y);
+        file.read("%lf", &basis_3d.e_3.z);
+        file.read("%lf", &basis_3d.r_p.x);
+        file.read("%lf", &basis_3d.r_p.y);
+        file.read("%lf", &basis_3d.r_p.z);
+        file.read("%d", &basis_3d.physical_group_m);
+        file.read("%d", &basis_3d.physical_group_p);
+        basis_3d.get_values();
+        this->basis_3d_list[i] = basis_3d;
+    }
     file.close();
 }
