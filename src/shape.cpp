@@ -52,6 +52,23 @@ void shape_t::set(){
 void shape_t::log_mesh(){
     file_t file;
     //
+    file.open("mesh/mesh/mesh_1d_elements_log.txt", 'w');
+    file.write("number of edge: %zu\n\n", this->N_edges);
+    for (size_t i=0; i<this->N_edges; i++){
+        file.write("edge: %zu: group: %d\n", i, 
+            this->edge_data[i].physical_group);
+        file.write("%21.14E, %21.14E, %21.14E\n", 
+            this->edge_data[i].v[0].x,
+            this->edge_data[i].v[0].y,
+            this->edge_data[i].v[0].z);
+        file.write("%21.14E, %21.14E, %21.14E\n", 
+            this->edge_data[i].v[1].x,
+            this->edge_data[i].v[1].y,
+            this->edge_data[i].v[1].z);
+        file.write("\n");
+    }
+    file.close();
+    //
     file.open("mesh/mesh/mesh_2d_elements_log.txt", 'w');
     file.write("number of triangles: %zu\n\n", this->N_triangles);
     for (size_t i=0; i<this->N_triangles; i++){
@@ -178,6 +195,8 @@ void shape_t::get_mesh(){
         return_value = system("python3 mesh/generate_mesh.py");
     #endif
     assert_error(return_value==0, "failed to call python");
+    shape_t::load_mesh();
+    shape_t::log_mesh();
 }
 
 void shape_t::assign_volume_properties(const complex_t eps, const int_t physical_group){
@@ -384,6 +403,7 @@ void shape_t::get_basis_functions(){
     file.write("%zu\n%zu\n%zu", this->N_1d_basis, this->N_2d_basis, this->N_3d_basis);
     file.close();
     shape_t::free_basic_elements();
+    shape_t::load_basis_functions();
 }
 
 void shape_t::free_basic_elements(){
