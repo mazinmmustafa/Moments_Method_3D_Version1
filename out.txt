@@ -1,0 +1,45 @@
+g++ -g -flto -Wall -Wextra -pedantic -std=c++14   -O2 -march=native -mtune=native  -MMD -MF  .dep/shape.d  -o .obj/shape.o -c src/shape.cpp -I include
+g++ -flto -o bin/program.exe .obj/bessel.o .obj/engine.o .obj/file.o .obj/main.o .obj/matrix.o .obj/quadl.o .obj/shape.o .obj/testbench.o .obj/utilities.o .obj/vector.o .obj/legendre_rule_wrapper.o .obj/toms644_wrapper.o .obj/legendre_rule.o .obj/toms644.o -L./ -lgfortran -lquadmath -lm
+executing build:
+reading mesh/shape.vtk..., done!
+expecting 98 vertices...
+expecting 162 elements...
+reading mesh file...
+found 0 0d elements
+found 0 1d elements
+found 162 2d elements
+found 0 3d elements
+done!
+loading mesh information..., done!
+
+1
+1
+1:
+(-7.50000000000000E-02, -1.56699000000000E-01,  0.00000000000000E+00)
+(-1.08374000000000E-01, -1.05867000000000E-01,  0.00000000000000E+00)
+(-1.24827000000000E-01, -1.58360000000000E-01,  0.00000000000000E+00)
+2:
+(-1.08374000000000E-01, -1.05867000000000E-01,  0.00000000000000E+00)
+(-7.50000000000000E-02, -1.56699000000000E-01,  0.00000000000000E+00)
+(-6.19240000000000E-02, -1.12763000000000E-01,  0.00000000000000E+00)
+
+2
+0
+2
+1
+
+3
+2
+1:
+(-7.50000000000000E-02, -1.56699000000000E-01,  0.00000000000000E+00)
+(-1.08374000000000E-01, -1.05867000000000E-01,  0.00000000000000E+00)
+(-1.24827000000000E-01, -1.58360000000000E-01,  0.00000000000000E+00)
+2:
+(-1.08374000000000E-01, -1.05867000000000E-01,  0.00000000000000E+00)
+(-1.57661000000000E-01, -1.24788000000000E-01,  0.00000000000000E+00)
+(-1.24827000000000E-01, -1.58360000000000E-01,  0.00000000000000E+00)
+
+0
+1
+1
+2

@@ -9,27 +9,27 @@
 
 // Definitions
 
-const real_t tol_vertex=1.0E-6;
+const real_t tol_vertex=1.0E-4;
 
 struct edge_t{
-    vector_t<real_t> v1, v2;
+    vector_t<real_t> v[2];
     int_t physical_group=0;
     real_t length=0.0;
     size_t N_adjacents=0;
     edge_t(){}
     edge_t(const vector_t<real_t> v1, const vector_t<real_t> v2, const int_t physical_group){
-        this->v1 = v1;
-        this->v2 = v2;
+        this->v[0] = v1;
+        this->v[1] = v2;
         get_length();
         this->physical_group = physical_group;
     }   
     void get_length(){
-        this->length = mag(v1-v2);
+        this->length = mag(v[0]-v[1]);
     }
 };
 
 struct triangle_t{
-    vector_t<real_t> v1, v2, v3;
+    vector_t<real_t> v[3];
     int_t physical_group=0;
     real_t area=0.0;
     vector_t<real_t> n;
@@ -37,20 +37,21 @@ struct triangle_t{
     triangle_t(){}
     triangle_t(const vector_t<real_t> v1, const vector_t<real_t> v2, 
         const vector_t<real_t> v3, const int_t physical_group){
-        this->v1 = v1;
-        this->v2 = v2;
-        this->v3 = v3;
+        this->v[0] = v1;
+        this->v[1] = v2;
+        this->v[2] = v3;
         get_area();
         this->physical_group = physical_group;
     }
     void get_area(){
-        this->area = mag((v2-v1)^(v3-v1))/2.0;
-        this->n = unit((v2-v1)^(v3-v1));
+        vector_t<real_t> vector=(v[1]-v[0])^(v[2]-v[0]);
+        this->area = mag(vector)/2.0;
+        this->n = unit(vector);
     }
 };
 
 struct tetrahedron_t{
-    vector_t<real_t> v1, v2, v3, v4;
+    vector_t<real_t> v[4];
     int_t physical_group=0;
     real_t volume=0.0;
     complex_t eps=1.0;
@@ -58,15 +59,32 @@ struct tetrahedron_t{
     tetrahedron_t(){}
     tetrahedron_t(const vector_t<real_t> v1, const vector_t<real_t> v2, 
         const vector_t<real_t> v3, const vector_t<real_t> v4, const int_t physical_group){
-        this->v1 = v1;
-        this->v2 = v2;
-        this->v3 = v3;
-        this->v4 = v4;
+        this->v[0] = v1;
+        this->v[1] = v2;
+        this->v[2] = v3;
+        this->v[3] = v4;
         get_volume();
         this->physical_group = physical_group;
     }
     void get_volume(){
-        this->volume = ((v2-v1)^(v3-v1))*(v4-v1)/6.0;
+        this->volume = ((v[1]-v[0])^(v[2]-v[0]))*(v[3]-v[0])/6.0;
+    }
+};
+
+struct basis_1d_t{
+    vector_t<real_t> r_m, r_p;
+    real_t l;
+    vector_t<real_t> L;
+    int_t physical_group_m=0, physical_group_p=0;
+    basis_1d_t(){}
+    basis_1d_t(const vector_t<real_t> r_m, const vector_t<real_t> r_p){
+        this->r_m = r_m;
+        this->r_p = r_p;
+        basis_1d_t::get_values();
+    }
+    void get_values(){
+        this->L = +1.0*(this->r_p-this->r_m);
+        this->l = mag(this->L);
     }
 };
 
@@ -85,30 +103,67 @@ struct basis_2d_t{
         basis_2d_t::get_values();
     }
     void get_values(){
+        this->L_m1 = +1.0*(e1-r_m);
+        this->L_m2 = +1.0*(e2-r_m);
+        this->L_p1 = -1.0*(e1-r_p);
+        this->L_p2 = -1.0*(e2-r_p);
+        this->L = mag(e1-e2);
+        this->A_m = mag(L_m1^L_m2)/2.0;
+        this->A_p = mag(L_p1^L_p2)/2.0;
+        this->n_m = unit(L_m1^L_m2);
+        this->n_p = unit(L_p1^L_p2);
+    }
+};
+
+struct basis_3d_t{
+    vector_t<real_t> r_m, r_p, e1, e2, e3;
+    vector_t<real_t> n, n_m1, n_m2, n_m3, n_p1, n_p2, n_p3;
+    real_t A, V_m, V_p;
+    vector_t<real_t> L_m1, L_m2, L_m3, L_p1, L_p2, L_p3;
+    int_t physical_group_m=0, physical_group_p=0;
+    basis_3d_t(){}
+    basis_3d_t(const vector_t<real_t> r_m, const vector_t<real_t> r_p, 
+        const vector_t<real_t> e1, const vector_t<real_t> e2, const vector_t<real_t> e3){
+        this->r_m = r_m;
+        this->r_p = r_p;
+        this->e1 = e1;
+        this->e2 = e2;
+        this->e3 = e3;
+        basis_3d_t::get_values();
+    }
+    void get_values(){
         this->L_m1 = +1.0*(this->e1-this->r_m);
         this->L_m2 = +1.0*(this->e2-this->r_m);
-        this->L_m1 = -1.0*(this->e1-this->r_p);
-        this->L_m2 = -1.0*(this->e2-this->r_p);
-        this->L = mag(this->e1-this->e2);
-        this->A_m = mag((this->e1-this->r_m)^(this->e2-this->r_m))/2.0;
-        this->A_p = mag((this->e2-this->r_p)^(this->e1-this->r_p))/2.0;
-        this->n_m = unit((this->e1-this->r_m)^(this->e2-this->r_m));
-        this->n_p = unit((this->e2-this->r_p)^(this->e1-this->r_p));
+        this->L_m3 = +1.0*(this->e3-this->r_m);
+        this->L_p1 = -1.0*(this->e1-this->r_p);
+        this->L_p2 = -1.0*(this->e2-this->r_p);
+        this->L_p3 = -1.0*(this->e3-this->r_p);
+        vector_t<real_t> vector;
+        vector=(e2-e1)^(e3-e1);
+        this->A = mag(vector)/2.0;
+        this->V_m = +1.0*(L_m1^L_m2)*L_m3/6.0;
+        this->V_p = -1.0*(L_p1^L_p2)*L_p3/6.0;
     }
 };
 
 class shape_t{
     private:
         size_t N_points=0, N_edges=0, N_triangles=0, N_tetrahedrons=0;
+        edge_t *edge_data=null;
         triangle_t *triangle_data=null;
         tetrahedron_t *tetrahedron_data=null;
+        int is_edge_allocated=false;
         int is_triangle_allocated=false;
         int is_tetrahedron_allocated=false;
+        int is_basis_1d_list_allocated=false;
         int is_basis_2d_list_allocated=false;
+        int is_basis_3d_list_allocated=false;
         void set();
         void unset();
         size_t N_1d_basis=0, N_2d_basis=0, N_3d_basis=0;
+        basis_1d_t *basis_1d_list=null;
         basis_2d_t *basis_2d_list=null;
+        basis_3d_t *basis_3d_list=null;
     public:
         shape_t();
         ~shape_t();

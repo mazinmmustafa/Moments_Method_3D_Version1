@@ -94,7 +94,7 @@ vector_t<real_t> unit(const vector_t<real_t> A){
 }
 
 int is_equal(const vector_t<real_t> A, const vector_t<real_t> B, const real_t tol){
-    if (abs(A.x-B.x)<=abs(tol) && abs(A.y-B.y)<=abs(tol) && abs(A.z-B.z)<=abs(tol)){
+    if (abs(A.x-B.x)<=abs(A.x*tol) && abs(A.y-B.y)<=abs(A.y*tol) && abs(A.z-B.z)<=abs(A.z*tol)){
         return true;
     }else{
         return false;

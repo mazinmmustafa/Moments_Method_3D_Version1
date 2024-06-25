@@ -270,8 +270,8 @@ void test_shape(){
     shape.get_mesh();
     shape.load_mesh();
     shape.log_mesh();
-    enum physical_groups{patch=1, ground=2, port=3, substrate=4};  
 
+    enum physical_groups{patch=1, ground=2, port=3, substrate=4};  
     const complex_t eps_substrate=4.3;
     shape.assign_volume_properties(eps_substrate, substrate);
 
