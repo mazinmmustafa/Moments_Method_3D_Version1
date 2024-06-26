@@ -21,5 +21,6 @@ void test_read_write_binary_files();
 void test_matrix();
 void test_quadl();
 void test_shape();
+void test_engine();
 
 #endif

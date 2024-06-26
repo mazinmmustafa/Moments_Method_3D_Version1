@@ -54,7 +54,8 @@ struct tetrahedron_t{
     vector_t<real_t> v[4];
     int_t physical_group=0;
     real_t volume=0.0;
-    complex_t eps=1.0;
+    complex_t eps=complex_t(+1.0, -0.0);
+    complex_t mu=complex_t(+1.0, -0.0);
     size_t N_adjacents=0;
     tetrahedron_t(){}
     tetrahedron_t(const vector_t<real_t> v1, const vector_t<real_t> v2, 
@@ -180,5 +181,6 @@ class shape_t{
 
 // Functions
 
+// gmsh mesh/shape.brep -3 -clmax 0.05 -format vtk -save_all -o mesh/shape.vtk
 
 #endif

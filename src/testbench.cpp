@@ -277,6 +277,16 @@ void test_shape(){
 
 }
 
+void test_engine(){
+
+    shape_t shape;
+    shape.get_mesh();
+    shape.get_basis_functions();
+
+    engine_t engine;
+    
+}
+
 
 
 

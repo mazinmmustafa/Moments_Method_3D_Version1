@@ -12,6 +12,12 @@
 #include "shape.hpp"
 
 // Definitions
+class engine_t{
+    private:
+    public:
+        engine_t();
+        ~engine_t();
+};
 
 // Functions
 
