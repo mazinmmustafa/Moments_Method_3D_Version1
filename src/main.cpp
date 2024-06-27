@@ -10,7 +10,7 @@ int main(){
     // test_matrix();
     // test_quadl();
     // test_shape();
-    void test_engine();
+    test_engine();
 
     return 0;
 

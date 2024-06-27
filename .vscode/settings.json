@@ -4,6 +4,7 @@
         "*.tcc": "cpp",
         "random": "cpp",
         "fstream": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "complex": "cpp"
     }
 }

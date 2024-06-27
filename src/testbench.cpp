@@ -277,6 +277,10 @@ void test_shape(){
 
 }
 
+complex_t dummy(const complex_t z){
+    return 2.0*z;
+}
+
 void test_engine(){
 
     shape_t shape;
@@ -295,8 +299,6 @@ void test_engine(){
     basis_m.get_values();
     basis_n.get_values();
 
-    
-    
 }
 
 
