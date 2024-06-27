@@ -79,3 +79,9 @@ projection_3d_t get_projection_3d(const vector_t<real_t> v1, const vector_t<real
 }
 
 //
+
+void R_mn_2d(const complex_t alpha, const complex_t beta, const complex_t alpha_, const complex_t beta_, 
+    const basis_2d_t *basis_m, const basis_2d_t *basis_n, 
+    real_t &R_mn_mm, real_t &R_mn_mp, real_t &R_mn_pm, real_t &R_mn_pp){
+    
+}
