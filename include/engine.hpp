@@ -12,13 +12,6 @@
 #include "shape.hpp"
 
 // Definitions
-class engine_t{
-    private:
-    public:
-        engine_t();
-        ~engine_t();
-};
-
 struct projection_1d_t{
     vector_t<real_t> p0, P0_u;
     real_t l_m, l_p;
@@ -37,6 +30,16 @@ struct projection_3d_t{
     vector_t<real_t> n[4];
 };
 
+class engine_t{
+    private:
+    public:
+        engine_t();
+        ~engine_t();
+};
+
+
 // Functions
+
+
 
 #endif

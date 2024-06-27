@@ -77,3 +77,5 @@ projection_3d_t get_projection_3d(const vector_t<real_t> v1, const vector_t<real
     get_projection_3d_triangle(v3, v2, v1, p, para_3d.n[3], para_3d.para_2d[3]);
     return para_3d;
 }
+
+//

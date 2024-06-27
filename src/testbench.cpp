@@ -284,6 +284,18 @@ void test_engine(){
     shape.get_basis_functions();
 
     engine_t engine;
+
+    vector_t<real_t> v1_m, v2_m, v3_m, v4_m;
+    vector_t<real_t> v1_n, v2_n, v3_n, v4_n;
+    v1_m.x = -0.1; v1_m.y = +0.0; v1_m.z = +0.0;
+    v2_m.x = +0.0; v2_m.y = -0.1; v2_m.z = +0.0;
+    v3_m.x = +0.0; v3_m.y = +0.1; v3_m.z = +0.0;
+    v4_m.x = +0.1; v1_m.y = +0.0; v1_m.z = +0.0;
+    basis_2d_t basis_m(v1_m, v4_m, v2_m, v4_m), basis_n(v1_m, v4_m, v2_m, v4_m);
+    basis_m.get_values();
+    basis_n.get_values();
+
+    
     
 }
 
