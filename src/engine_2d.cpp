@@ -143,7 +143,7 @@ complex_t term_2d_phi(const basis_2d_t &basis_m, const basis_2d_t &basis_n){
 complex_t get_phi_mn_2d(const complex_t k, 
     const basis_2d_t &basis_m, const basis_2d_t &basis_n, 
     quadl_domain_t quadl, int &flag){
-    integrand_2d_args args={basis_m, basis_n, k};
+    integrand_2d_args args={basis_m, basis_n, k, 0.0, 0.0};
     triangle_domain_t triangle;
     vector_t<real_t> v1(0.0, 0.0, 0.0);
     vector_t<real_t> v2(1.0, 0.0, 0.0);
@@ -153,5 +153,7 @@ complex_t get_phi_mn_2d(const complex_t k,
     triangle.v3 = v3;
     complex_t I1=quadl.integral_2d(integrand_2d_phi, &args, triangle, flag);
     complex_t I2=term_2d_phi(basis_m, basis_n);
+    print(I1);
+    print(I2);
     return I1+I2;
 }
