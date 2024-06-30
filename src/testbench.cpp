@@ -289,16 +289,41 @@ void test_engine(){
 
     engine_t engine;
 
+    quadl_domain_t quadl;
+    const size_t k_max=50;
+    const real_t tol=1.0E-4;
+
+    quadl.set(k_max, tol);
+
+    int flag;
+
+    // B_m.r_m = Vector(+0.0, -0.1, +0.0);
+    // B_m.e_m = Vector(+0.2, +0.0, +0.0);
+    // B_m.r_p = Vector(+0.0, +0.2, +0.0);
+    // B_m.e_p = Vector(-0.3, +0.0, +0.0);
+
+    // B_n.r_m = Vector(+0.0, -0.1, +0.0);
+    // B_n.e_m = Vector(+0.2, +0.0, +0.0);
+    // B_n.r_p = Vector(+0.0, +0.2, +0.0);
+    // B_n.e_p = Vector(-0.3, +0.0, +0.0);
+
     vector_t<real_t> v1_m, v2_m, v3_m, v4_m;
     vector_t<real_t> v1_n, v2_n, v3_n, v4_n;
-    v1_m.x = -0.1; v1_m.y = +0.0; v1_m.z = +0.0;
-    v2_m.x = +0.0; v2_m.y = -0.1; v2_m.z = +0.0;
-    v3_m.x = +0.0; v3_m.y = +0.1; v3_m.z = +0.0;
-    v4_m.x = +0.1; v1_m.y = +0.0; v1_m.z = +0.0;
-    basis_2d_t basis_m(v1_m, v4_m, v2_m, v4_m), basis_n(v1_m, v4_m, v2_m, v4_m);
+    v1_m.x = +0.0; v1_m.y = -0.1; v1_m.z = +0.0;
+    v2_m.x = +0.2; v2_m.y = +0.0; v2_m.z = +0.0;
+    v3_m.x = +0.0; v3_m.y = +0.2; v3_m.z = +0.0;
+    v4_m.x = -0.3; v1_m.y = +0.0; v1_m.z = +0.0;
+    basis_2d_t basis_m(v1_m, v2_m, v3_m, v4_m), basis_n(v1_m, v2_m, v3_m, v4_m);
     basis_m.get_values();
     basis_n.get_values();
 
+    complex_t ans;
+    complex_t k=2.0*pi;
+    complex_t eta=120.0*pi;
+    complex_t j=complex_t(0.0, 1.0);
+    ans = (-j*eta/k)*get_phi_mn_2d(k, basis_m, basis_n, quadl, flag);
+    if(flag){print("I_3d: no convergence!\n");}
+    print(ans);
 }
 
 
