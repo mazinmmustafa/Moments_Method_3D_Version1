@@ -30,6 +30,7 @@ void g_mn_2d(const real_t alpha_m, const real_t beta_m, const real_t alpha_n, co
 struct integrand_2d_args{
     basis_2d_t basis_m, basis_n;
     complex_t k;
+    real_t alpha, beta;
 };
 
 complex_t integrand_2d_phi(const complex_t alpha_, const complex_t beta_, void *args_){
