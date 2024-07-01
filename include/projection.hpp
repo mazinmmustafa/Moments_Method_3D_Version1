@@ -37,4 +37,11 @@ projection_2d_t get_projection_2d(const vector_t<real_t> v1, const vector_t<real
 projection_3d_t get_projection_3d(const vector_t<real_t> v1, const vector_t<real_t> v2,
     const vector_t<real_t> v3, const vector_t<real_t> v4, const vector_t<real_t> p);
 
+void get_projection_2d_edge(const vector_t<real_t> v1, const vector_t<real_t> v2,
+    const vector_t<real_t> v3, const vector_t<real_t> p, projection_1d_t &para_1d,
+    real_t &d, real_t &R0, real_t &R_m, real_t &R_p, vector_t<real_t> &u, vector_t<real_t> &n);
+void get_projection_3d_triangle(const vector_t<real_t> v1, const vector_t<real_t> v2,
+    const vector_t<real_t> v3, const vector_t<real_t> p, vector_t<real_t> &n,
+    projection_2d_t &para_2d);
+
 #endif

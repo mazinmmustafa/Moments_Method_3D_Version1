@@ -61,10 +61,11 @@ complex_t term_2d_phi(const basis_2d_t &basis_m, const basis_2d_t &basis_n){
     vector_t<real_t> p_m_m=+1.0*(basis_m.r_m+alpha*basis_m.L_m1+beta*basis_m.L_m2);
     vector_t<real_t> p_m_p=+1.0*(basis_m.r_p-alpha*basis_m.L_p1-beta*basis_m.L_p2);
     real_t I_m_m, I_m_p, I_p_m, I_p_p;
-    para_m_m = get_projection_2d(basis_n.r_m, basis_n.e_1, basis_m.e_2, p_m_m);    
-    para_m_p = get_projection_2d(basis_n.r_m, basis_n.e_1, basis_m.e_2, p_m_p);    
-    para_p_m = get_projection_2d(basis_n.r_p, basis_n.e_2, basis_m.e_1, p_m_m);  
-    para_p_p = get_projection_2d(basis_n.r_p, basis_n.e_2, basis_m.e_1, p_m_p);  
+    vector_t<real_t> n;
+    get_projection_3d_triangle(basis_n.r_m, basis_n.e_1, basis_m.e_2, p_m_m, n, para_m_m);
+    get_projection_3d_triangle(basis_n.r_m, basis_n.e_1, basis_m.e_2, p_m_p, n, para_m_p);
+    get_projection_3d_triangle(basis_n.r_p, basis_n.e_2, basis_m.e_1, p_m_m, n, para_p_m);
+    get_projection_3d_triangle(basis_n.r_p, basis_n.e_2, basis_m.e_1, p_m_p, n, para_p_p);
     real_t R_p, R_m, R0;
     real_t l_p, l_m, P0;
     real_t d;
@@ -85,6 +86,14 @@ complex_t term_2d_phi(const basis_2d_t &basis_m, const basis_2d_t &basis_n){
         term_2 = P0*log((R_p+l_p)/(R_m+l_m));
         term_3 = atan2(P0*l_p, R0*R0+d*R_p);
         term_4 = atan2(P0*l_m, R0*R0+d*R_m);
+        print("========\n");
+        print(R0);
+        print(R_m);
+        print(d);
+        print(l_p);
+        print(u);
+        print(P0);
+        exit(0);
         I_m_m+=term_1*(term_2-d*(term_3-term_4));
         // term mp
         R0 = para_m_p.R0[i];
