@@ -10,7 +10,9 @@ template <typename type_t>
 class vector_t{
     private:
     public:
-        type_t x=(type_t)0.0, y=(type_t)0.0, z=(type_t)0.0;
+        type_t x=(type_t)0.0;
+        type_t y=(type_t)0.0;
+        type_t z=(type_t)0.0;
         vector_t(){}
         ~vector_t(){}
         vector_t(const type_t x, const type_t y, const type_t z){
