@@ -12,7 +12,7 @@ FC = gfortran
 # Compiler Flags
 CXXFLG = -Wall -Wextra -pedantic -std=c++14  
 CFLG = -Wall -Wextra -pedantic -std=c17
-F90FLG = -Wall -Wextra -pedantic 
+F90FLG = -Wall -Wextra -pedantic
 F77FLG =  
 
 CLIB = -lgfortran -lquadmath -lm

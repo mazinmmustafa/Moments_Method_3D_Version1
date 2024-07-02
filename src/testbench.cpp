@@ -212,55 +212,55 @@ complex_t func_3d_tetrahedron(const complex_t x, const complex_t y, const comple
 
 void test_quadl(){
 
-    quadl_t quadl;
-    const size_t N_quadl=16;
-    const size_t k_max=15;
-    const real_t tol=1.0E-10;
+    // quadl_t quadl;
+    // const size_t N_quadl=16;
+    // const size_t k_max=15;
+    // const real_t tol=1.0E-10;
 
-    quadl.set(N_quadl, k_max, tol);
-    quadl.disp();
-    print("\n\n");
+    // quadl.set(N_quadl, k_max, tol);
+    // quadl.disp();
+    // print("\n\n");
 
-    int flag;
+    // int flag;
 
-    real_t beta=10.0;
-    func_1d_args args_1d={beta};
-    // +4.14742169407021E-01
-    print(quadl.integral_1d(func_1d_wrapper, &args_1d, -2.0, +4.0, flag));
-    if(flag){print("I_1d: no convergence!\n");}
+    // real_t beta=10.0;
+    // func_1d_args args_1d={beta};
+    // // +4.14742169407021E-01
+    // print(quadl.integral_1d(func_1d_wrapper, &args_1d, -2.0, +4.0, flag));
+    // if(flag){print("I_1d: no convergence!\n");}
     
-    real_t alpha=0.2; 
-    beta = 2.0;
-    func_2d_args args_2d={alpha, beta};
-    // +2.13734707679366E+00
-    print(quadl.integral_2d(func_2d_wrapper, &args_2d, -1.0, +1.0, -1.0, +1.0, flag));
-    if(flag){print("I_2d: no convergence!\n");}
+    // real_t alpha=0.2; 
+    // beta = 2.0;
+    // func_2d_args args_2d={alpha, beta};
+    // // +2.13734707679366E+00
+    // print(quadl.integral_2d(func_2d_wrapper, &args_2d, -1.0, +1.0, -1.0, +1.0, flag));
+    // if(flag){print("I_2d: no convergence!\n");}
 
-    // +3.14159265358979E+00
-    print(quadl.integral_3d(func_3d, null, 0.0, 1.0, 0.0, 2.0*pi, -0.5, +0.5, flag));  
-    if(flag){print("I_3d: no convergence!\n");}
+    // // +3.14159265358979E+00
+    // print(quadl.integral_3d(func_3d, null, 0.0, 1.0, 0.0, 2.0*pi, -0.5, +0.5, flag));  
+    // if(flag){print("I_3d: no convergence!\n");}
 
-    //
-    quadl_domain_t quadl_domain;
-    quadl_domain.set(2500, 1.0E-4);
+    // //
+    // quadl_domain_t quadl_domain;
+    // quadl_domain.set(2500, 1.0E-4);
 
-    line_domain_t line={vector_t<real_t>(0.0, 0.0, 0.0), vector_t<real_t>(1.0, 0.0, 0.0)};
-    print(quadl_domain.integral_1d(func_1d_line, null, line, flag));
-    if(flag){print("I_1d: no convergence!\n");}
+    // line_domain_t line={vector_t<real_t>(0.0, 0.0, 0.0), vector_t<real_t>(1.0, 0.0, 0.0)};
+    // print(quadl_domain.integral_1d(func_1d_line, null, line, flag));
+    // if(flag){print("I_1d: no convergence!\n");}
 
-    triangle_domain_t triangle={vector_t<real_t>(0.0, 0.0, 0.0), 
-    vector_t<real_t>(1.0, 0.0, 0.0), vector_t<real_t>(0.0, 1.0, 0.0)};
-    print(quadl_domain.integral_2d(func_2d_triangle, null, triangle, flag));
-    if(flag){print("I_2d: no convergence!\n");}
+    // triangle_domain_t triangle={vector_t<real_t>(0.0, 0.0, 0.0), 
+    // vector_t<real_t>(1.0, 0.0, 0.0), vector_t<real_t>(0.0, 1.0, 0.0)};
+    // print(quadl_domain.integral_2d(func_2d_triangle, null, triangle, flag));
+    // if(flag){print("I_2d: no convergence!\n");}
 
-    tetrahedral_domain_t tetrahedron={
-        vector_t<real_t>(0.0, 0.0, 0.0),
-        vector_t<real_t>(1.0, 0.0, 0.0),
-        vector_t<real_t>(0.0, 1.0, 0.0),
-        vector_t<real_t>(0.0, 0.0, 1.0)
-    };
-    print(quadl_domain.integral_3d(func_3d_tetrahedron, null, tetrahedron, flag));
-    if(flag){print("I_3d: no convergence!\n");}
+    // tetrahedral_domain_t tetrahedron={
+    //     vector_t<real_t>(0.0, 0.0, 0.0),
+    //     vector_t<real_t>(1.0, 0.0, 0.0),
+    //     vector_t<real_t>(0.0, 1.0, 0.0),
+    //     vector_t<real_t>(0.0, 0.0, 1.0)
+    // };
+    // print(quadl_domain.integral_3d(func_3d_tetrahedron, null, tetrahedron, flag));
+    // if(flag){print("I_3d: no convergence!\n");}
     
 }
 
@@ -283,29 +283,21 @@ complex_t dummy(const complex_t z){
 
 void test_engine(){
 
-    shape_t shape;
-    shape.get_mesh();
-    shape.get_basis_functions();
+    // shape_t shape;
+    // shape.get_mesh();
+    // shape.get_basis_functions();
 
     engine_t engine;
 
     quadl_domain_t quadl;
-    const size_t k_max=100;
+    const size_t k_max=6;
     const real_t tol=1.0E-4;
 
-    quadl.set(k_max, tol);
-
+    quadl.set_2d(k_max, tol);
     int flag;
-
-    // B_m.r_m = Vector(+0.0, -0.1, +0.0);
-    // B_m.e_m = Vector(+0.2, +0.0, +0.0);
-    // B_m.r_p = Vector(+0.0, +0.2, +0.0);
-    // B_m.e_p = Vector(-0.3, +0.0, +0.0);
-
-    // B_n.r_m = Vector(+0.0, -0.1, +0.0);
-    // B_n.e_m = Vector(+0.2, +0.0, +0.0);
-    // B_n.r_p = Vector(+0.0, +0.2, +0.0);
-    // B_n.e_p = Vector(-0.3, +0.0, +0.0);
+    const complex_t k=20.*pi;
+    const complex_t eta=120.0*pi;
+    const complex_t j=complex_t(0.0, 1.0);
 
     vector_t<real_t> v1_m, v2_m, v3_m, v4_m;
     v1_m.x = +0.0; 
@@ -326,14 +318,34 @@ void test_engine(){
 
     basis_2d_t basis_m(v1_m, v2_m, v3_m, v4_m), basis_n(v1_m, v2_m, v3_m, v4_m);
 
-    complex_t ans;
-    complex_t k=2.0*pi;
-    complex_t eta=120.0*pi;
-    complex_t j=complex_t(0.0, 1.0);
-    ans = (-j*eta/k)*get_phi_mn_2d(k, basis_m, basis_n, quadl, flag);
-    if(flag){print("I_3d: no convergence!\n");}
-    print(ans);
+
+    timer_t timer;
+    timer.set();
+    print(get_integral(quadl, flag));
+    timer.unset();
+    print(flag);
+
+    real_t R_mm, R_mp, R_pm, R_pp;
+    R_mn_2d(0.1, 0.2, 0.3, 0.4, basis_m, basis_n, R_mm, R_mp, R_pm, R_pp);
+    print(R_mm);
+    print(R_mp);
+    print(R_pm);
+    print(R_pp);
+    complex_t g_mm, g_mp, g_pm, g_pp;
+    g_mn_2d(0.1, 0.2, 0.3, 0.4, 2.0*pi, basis_m, basis_n, g_mm, g_mp, g_pm, g_pp);  
+    print(g_mm);
+    print(g_mp);
+    print(g_pm);
+    print(g_pp);
+
+    print("====\n");
+    timer.set();
+    print((-j*eta/k)*phi_2d(basis_m, basis_n, k, quadl, flag));
+    timer.unset();
+    print(flag);
+
 }
+
 
 
 

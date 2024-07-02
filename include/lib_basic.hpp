@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdint.h>
+#include <limits.h>
 
 // Definitions
 #define true 1

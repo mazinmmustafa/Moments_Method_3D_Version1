@@ -106,13 +106,13 @@ struct basis_2d_t{
     void get_values(){
         this->L_m1 = +1.0*(e_1-r_m);
         this->L_m2 = +1.0*(e_2-r_m);
-        this->L_p1 = -1.0*(e_1-r_p);
-        this->L_p2 = -1.0*(e_2-r_p);
+        this->L_p1 = +1.0*(e_1-r_p);
+        this->L_p2 = +1.0*(e_2-r_p);
         this->L = mag(e_1-e_2);
         this->A_m = mag(L_m1^L_m2)/2.0;
-        this->A_p = mag(L_p1^L_p2)/2.0;
+        this->A_p = mag(L_p2^L_p1)/2.0;
         this->n_m = unit(L_m1^L_m2);
-        this->n_p = unit(L_p1^L_p2);
+        this->n_p = unit(L_p2^L_p1);
     }
 };
 

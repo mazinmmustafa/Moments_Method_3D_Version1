@@ -24,6 +24,25 @@ class range_t{
         void get_info(real_t *x_min, real_t *x_max, size_t *Ns);
 };
 
+class timer_t{
+private:
+    int is_set=false;
+    #ifdef __windows__
+    time_t start, stop;
+    #endif
+    #ifdef __linux__
+    struct timespec start, stop;
+    #endif
+    double elapsed=0.0;
+public:
+    timer_t();
+    ~timer_t();
+    void set();
+    void unset();
+    void unset_silent();
+    double get_elapsed();
+};
+
 // Functions
 void print(const char *format, ...);
 void print(const int_t n);
