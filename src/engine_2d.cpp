@@ -30,7 +30,6 @@ void g_mn_2d(const real_t alpha_m, const real_t beta_m, const real_t alpha_n, co
 struct integrand_2d_args{
     basis_2d_t basis_m, basis_n;
     complex_t k;
-    real_t alpha, beta;
 };
 
 complex_t integrand_2d_phi(const complex_t alpha_, const complex_t beta_, void *args_){
@@ -61,11 +60,10 @@ complex_t term_2d_phi(const basis_2d_t &basis_m, const basis_2d_t &basis_n){
     vector_t<real_t> p_m_m=+1.0*(basis_m.r_m+alpha*basis_m.L_m1+beta*basis_m.L_m2);
     vector_t<real_t> p_m_p=-1.0*(basis_m.r_p+alpha*basis_m.L_p1+beta*basis_m.L_p2);
     real_t I_m_m, I_m_p, I_p_m, I_p_p;
-    vector_t<real_t> n;
-    get_projection_3d_triangle(basis_n.r_m, basis_n.e_1, basis_m.e_2, p_m_m, n, para_m_m);
-    get_projection_3d_triangle(basis_n.r_m, basis_n.e_1, basis_m.e_2, p_m_p, n, para_m_p);
-    get_projection_3d_triangle(basis_n.r_p, basis_n.e_2, basis_m.e_1, p_m_m, n, para_p_m);
-    get_projection_3d_triangle(basis_n.r_p, basis_n.e_2, basis_m.e_1, p_m_p, n, para_p_p);
+    para_m_m = get_projection_2d(basis_n.r_m, basis_n.e_1, basis_n.e_2, p_m_m);
+    para_m_p = get_projection_2d(basis_n.r_m, basis_n.e_1, basis_n.e_2, p_m_p);
+    para_p_m = get_projection_2d(basis_n.r_p, basis_n.e_2, basis_n.e_1, p_m_m);
+    para_p_p = get_projection_2d(basis_n.r_p, basis_n.e_2, basis_n.e_1, p_m_p);
     real_t R_p, R_m, R0;
     real_t l_p, l_m, P0;
     real_t d;
@@ -144,7 +142,7 @@ complex_t term_2d_phi(const basis_2d_t &basis_m, const basis_2d_t &basis_n){
 complex_t get_phi_mn_2d(const complex_t k, 
     const basis_2d_t &basis_m, const basis_2d_t &basis_n, 
     quadl_domain_t quadl, int &flag){
-    integrand_2d_args args={basis_m, basis_n, k, 0.0, 0.0};
+    integrand_2d_args args={basis_m, basis_n, k};
     triangle_domain_t triangle;
     vector_t<real_t> v1(0.0, 0.0, 0.0);
     vector_t<real_t> v2(1.0, 0.0, 0.0);

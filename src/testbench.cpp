@@ -290,7 +290,7 @@ void test_engine(){
     engine_t engine;
 
     quadl_domain_t quadl;
-    const size_t k_max=50;
+    const size_t k_max=100;
     const real_t tol=1.0E-4;
 
     quadl.set(k_max, tol);
@@ -325,7 +325,7 @@ void test_engine(){
     v4_m.z = +0.0;
 
     basis_2d_t basis_m(v1_m, v2_m, v3_m, v4_m), basis_n(v1_m, v2_m, v3_m, v4_m);
-    
+
     complex_t ans;
     complex_t k=2.0*pi;
     complex_t eta=120.0*pi;
