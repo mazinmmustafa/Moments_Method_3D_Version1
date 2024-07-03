@@ -29,7 +29,5 @@ void g_mn_2d(const real_t alpha_m, const real_t beta_m, const real_t alpha_n, co
 complex_t phi_2d(const basis_2d_t basis_m, const basis_2d_t basis_n, const complex_t k, 
     quadl_domain_t quadl, int &flag);
 
-complex_t integrand_phi_2d_inner(const complex_t alpha_n, const complex_t beta_n, void *args_);
-complex_t get_integral(quadl_domain_t quadl, int &flag);
 
 #endif

@@ -314,9 +314,9 @@ void quadl_domain_t::set_2d(const size_t k_max, const real_t tol){
     assert(this->w_2d!=null);
     this->is_2d_allocated = true;
     dunavant_rule_wrapper_(&this->rule_2d, &this->N_2d, this->x_2d, this->y_2d, this->w_2d);
-    for (size_t i=0; i<(size_t)this->N_2d; i++){
-        print("%21.14E %21.14E %21.14E\n", this->x_2d[i], this->y_2d[i], this->w_2d[i]);
-    }
+    // for (size_t i=0; i<(size_t)this->N_2d; i++){
+    //     print("%21.14E %21.14E %21.14E\n", this->x_2d[i], this->y_2d[i], this->w_2d[i]);
+    // }
 }
 
 
@@ -364,45 +364,6 @@ complex_t quadl_domain_t::quadl_2d_(complex_t (*func)(const complex_t, const com
         k = max_size_t(k1, k2);
     }
     return I_n;
-
-    // triangle_domain_t triangle_1, triangle_2;
-    // triangle_domain_t triangle_3, triangle_4;
-    // vector_t<real_t> m12=0.5*(triangle.v1+triangle.v2);
-    // vector_t<real_t> m23=0.5*(triangle.v2+triangle.v3);
-    // vector_t<real_t> m13=0.5*(triangle.v1+triangle.v3);
-    // //
-    // triangle_1.v1 = triangle.v1; 
-    // triangle_1.v2 = m12; 
-    // triangle_1.v3 = m13;
-    // //
-    // triangle_2.v1 = m12; 
-    // triangle_2.v2 = triangle.v2; 
-    // triangle_2.v3 = m23;
-    // //
-    // triangle_3.v1 = m13; 
-    // triangle_3.v2 = m23; 
-    // triangle_3.v3 = triangle.v3;
-    // //
-    // triangle_4.v1 = m23; 
-    // triangle_4.v2 = m13; 
-    // triangle_4.v3 = m12;
-    // //
-    // complex_t I1=quadl_domain_t::quadl_2d(func, args, triangle_1);
-    // complex_t I2=quadl_domain_t::quadl_2d(func, args, triangle_2);
-    // complex_t I3=quadl_domain_t::quadl_2d(func, args, triangle_3);
-    // complex_t I4=quadl_domain_t::quadl_2d(func, args, triangle_4);
-    // complex_t I_n=I1+I2+I3+I4;
-    // real_t error=abs(I_n-I_p);
-    // size_t k1=k, k2=k, k3=k, k4=k;
-    // if (error>this->tol_2d*abs(I_n)&&error>0.0){
-    //     I1 = quadl_domain_t::quadl_2d_(func, args, triangle_1, ++k1, I1);
-    //     I2 = quadl_domain_t::quadl_2d_(func, args, triangle_2, ++k2, I2);
-    //     I3 = quadl_domain_t::quadl_2d_(func, args, triangle_3, ++k3, I3);
-    //     I4 = quadl_domain_t::quadl_2d_(func, args, triangle_4, ++k4, I4);
-    //     I_n = I1+I2+I3+I4;
-    //     k = max_size_t(max_size_t(max_size_t(k1, k2), k3), k4);
-    // }
-    // return I_n;
 }
 
 complex_t quadl_domain_t::integral_2d(complex_t (*func)(const complex_t, const complex_t, void*), 

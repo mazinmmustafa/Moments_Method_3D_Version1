@@ -288,15 +288,16 @@ void test_engine(){
     // shape.get_basis_functions();
 
     engine_t engine;
+    timer_lib_t timer;
 
     quadl_domain_t quadl;
-    const size_t k_max=6;
+    const size_t k_max=10;
     const real_t tol=1.0E-4;
 
     quadl.set_2d(k_max, tol);
     int flag;
-    const complex_t k=20.*pi;
-    const complex_t eta=120.0*pi;
+    const complex_t k=2.0*pi;
+    const complex_t eta=sqrt(mu_0/eps_0);
     const complex_t j=complex_t(0.0, 1.0);
 
     vector_t<real_t> v1_m, v2_m, v3_m, v4_m;
@@ -318,31 +319,12 @@ void test_engine(){
 
     basis_2d_t basis_m(v1_m, v2_m, v3_m, v4_m), basis_n(v1_m, v2_m, v3_m, v4_m);
 
-
-    timer_t timer;
-    timer.set();
-    print(get_integral(quadl, flag));
-    timer.unset();
-    print(flag);
-
-    real_t R_mm, R_mp, R_pm, R_pp;
-    R_mn_2d(0.1, 0.2, 0.3, 0.4, basis_m, basis_n, R_mm, R_mp, R_pm, R_pp);
-    print(R_mm);
-    print(R_mp);
-    print(R_pm);
-    print(R_pp);
-    complex_t g_mm, g_mp, g_pm, g_pp;
-    g_mn_2d(0.1, 0.2, 0.3, 0.4, 2.0*pi, basis_m, basis_n, g_mm, g_mp, g_pm, g_pp);  
-    print(g_mm);
-    print(g_mp);
-    print(g_pm);
-    print(g_pp);
-
-    print("====\n");
     timer.set();
     print((-j*eta/k)*phi_2d(basis_m, basis_n, k, quadl, flag));
     timer.unset();
     print(flag);
+
+    quadl.unset_2d();
 
 }
 

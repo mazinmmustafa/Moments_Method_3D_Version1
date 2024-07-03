@@ -24,7 +24,7 @@ class range_t{
         void get_info(real_t *x_min, real_t *x_max, size_t *Ns);
 };
 
-class timer_t{
+class timer_lib_t{
 private:
     int is_set=false;
     #ifdef __windows__
@@ -35,8 +35,8 @@ private:
     #endif
     double elapsed=0.0;
 public:
-    timer_t();
-    ~timer_t();
+    timer_lib_t();
+    ~timer_lib_t();
     void set();
     void unset();
     void unset_silent();

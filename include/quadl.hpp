@@ -71,7 +71,7 @@ class quadl_domain_t{
     private:
         size_t k_max_2d=0;
         real_t tol_2d=1.0E-4;
-        int N_2d=37, rule_2d=13;
+        int N_2d=16, rule_2d=8;
         real_t *x_2d=null, *y_2d=null, *w_2d=null;
         int is_2d_allocated=false;
         //
@@ -88,12 +88,16 @@ class quadl_domain_t{
         // complex_t quadl_3d_(complex_t (*func)(const complex_t, const complex_t, const complex_t, void*), 
         //     void *args, const tetrahedral_domain_t tetrahedron, size_t &k, const complex_t I_p);
     public:
+        void unset_2d(){
+            if (this->is_2d_allocated){
+                free(this->x_2d);
+                free(this->y_2d);
+                free(this->w_2d);
+                this->is_2d_allocated = false;
+            }
+        }
         quadl_domain_t(){}
-        // ~quadl_domain_t(){
-        //     if (this->x_2d!=null){free(this->x_2d);}
-        //     if (this->y_2d!=null){free(this->y_2d);}
-        //     if (this->w_2d!=null){free(this->w_2d);}
-        // }
+        ~quadl_domain_t(){}
         void set_2d(const size_t k_max, const real_t tol);
         // complex_t integral_1d(complex_t (*func)(const complex_t, void*), 
         //     void *args, const line_domain_t line, int &flag);

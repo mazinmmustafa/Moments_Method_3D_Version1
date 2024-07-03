@@ -116,11 +116,11 @@ void range_t::get_info(real_t *x_min, real_t *x_max, size_t *Ns){
 
 //
 
-timer_t::timer_t(){}
+timer_lib_t::timer_lib_t(){}
 
-timer_t::~timer_t(){}
+timer_lib_t::~timer_lib_t(){}
 
-void timer_t::set(){
+void timer_lib_t::set(){
     #ifdef __windows__
     this->start = clock();
     #endif
@@ -130,9 +130,9 @@ void timer_t::set(){
     this->is_set = true;
 }
 
-void timer_t::unset(){
+void timer_lib_t::unset(){
     if (!this->is_set){
-        timer_t::set();
+        timer_lib_t::set();
     }
     #ifdef __windows__
         this->stop = clock();
@@ -145,7 +145,7 @@ void timer_t::unset(){
     #endif    
     print("elapsed time is ");
     if (this->elapsed<1.0){
-        print("%5.2f m seconds\n", this->elapsed*1000.0);
+        print("%5.2f milliseconds\n", this->elapsed*1000.0);
     }else
     if (this->elapsed<60.0){
         print("%5.2f seconds\n", this->elapsed);
@@ -158,7 +158,7 @@ void timer_t::unset(){
     this->is_set = false;
 }
 
-void timer_t::unset_silent(){
+void timer_lib_t::unset_silent(){
     #ifdef __windows__
         this->stop = clock();
         this->elapsed = (double)(this->stop-this->start)/CLOCKS_PER_SEC;
@@ -170,6 +170,6 @@ void timer_t::unset_silent(){
     #endif   
 }
 
-double timer_t::get_elapsed(){
+double timer_lib_t::get_elapsed(){
     return this->elapsed;
 }
