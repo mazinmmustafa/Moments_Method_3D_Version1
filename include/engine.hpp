@@ -12,15 +12,8 @@
 #include "shape.hpp"
 
 // Definitions
-class engine_t{
-    private:
-    public:
-        engine_t();
-        ~engine_t();
-};
 
 // Functions
-complex_t sinc(const complex_t x);
-real_t sinc(const real_t x);
+
 
 #endif

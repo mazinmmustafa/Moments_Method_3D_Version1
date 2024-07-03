@@ -10,7 +10,8 @@ int main(){
     // test_matrix();
     // test_quadl();
     // test_shape();
-    test_engine();
+    // test_engine_2d();
+    test_Z_mn_2d();
 
     return 0;
 

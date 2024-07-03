@@ -52,5 +52,7 @@ void print(const complex_t z);
 void __assert_error(const int_t condition, const char *error_msg, 
     const char* filename, const size_t line);
 void progress_bar(const size_t i, const size_t N, const char *msg);
+complex_t sinc(const complex_t x);
+real_t sinc(const real_t x);
 
 #endif

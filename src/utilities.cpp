@@ -144,7 +144,7 @@ void timer_lib_t::unset(){
             ((double)(this->stop.tv_nsec-this->start.tv_nsec)/1000000000L);
     #endif    
     print("elapsed time is ");
-    if (this->elapsed<1.0){
+    if (this->elapsed<0.1){
         print("%5.2f milliseconds\n", this->elapsed*1000.0);
     }else
     if (this->elapsed<60.0){
@@ -172,4 +172,14 @@ void timer_lib_t::unset_silent(){
 
 double timer_lib_t::get_elapsed(){
     return this->elapsed;
+}
+
+const real_t eps_sinc=1.0E-4;
+
+complex_t sinc(const complex_t x){
+    return abs(x)<eps_sinc ? 1.0 : sin(x)/x;
+}
+
+real_t sinc(const real_t x){
+    return abs(x)<eps_sinc ? 1.0 : sin(x)/x;
 }

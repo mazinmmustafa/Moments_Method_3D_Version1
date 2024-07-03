@@ -176,6 +176,11 @@ void shape_t::load_mesh(){
     print(", done!\n");
 }
 
+edge_t shape_t::get_edge_element(const size_t index){
+    assert_error(index<this->N_edges, "edge index is out of range");
+    return this->edge_data[index];
+}
+
 triangle_t shape_t::get_triangle_element(const size_t index){
     assert_error(index<this->N_triangles, "triangle index is out of range");
     return this->triangle_data[index];
@@ -184,6 +189,21 @@ triangle_t shape_t::get_triangle_element(const size_t index){
 tetrahedron_t shape_t::get_tetrahedron_element(const size_t index){
     assert_error(index<this->N_tetrahedrons, "tetrahedron index is out of range");
     return this->tetrahedron_data[index];
+}
+
+basis_1d_t shape_t::get_basis_1d(const size_t index){
+    assert_error(index<this->N_1d_basis, "basis index is out of range");
+    return this->basis_1d_list[index];
+}
+
+basis_2d_t shape_t::get_basis_2d(const size_t index){
+    assert_error(index<this->N_2d_basis, "basis index is out of range");
+    return this->basis_2d_list[index];
+}
+
+basis_3d_t shape_t::get_basis_3d(const size_t index){
+    assert_error(index<this->N_3d_basis, "basis index is out of range");
+    return this->basis_3d_list[index];
 }
 
 void shape_t::get_mesh(){
@@ -494,4 +514,18 @@ void shape_t::load_basis_functions(){
         this->basis_3d_list[i] = basis_3d;
     }
     file.close();
+}
+
+shape_info_t shape_t::get_shape_info(){
+    shape_info_t shape_info={this->N_1d_basis, this->N_2d_basis, this->N_3d_basis, 
+        this->is_basis_1d_list_allocated, this->is_basis_2d_list_allocated, this->is_basis_3d_list_allocated,
+        this->mu, this->eps};
+    return shape_info;
+}
+
+void shape_t::set_medium(const complex_t mu, const complex_t eps){
+    this->mu = mu;
+    this->eps = eps;
+    this->k = 2.0*pi*sqrt(mu*eps);
+    this->eta = sqrt(mu/eps);
 }

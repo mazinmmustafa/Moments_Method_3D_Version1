@@ -19,7 +19,7 @@ struct projection_1d_t{
 
 struct projection_2d_t{
     projection_1d_t para_1d[3];
-    vector_t<real_t> u[3];
+    vector_t<real_t> u[3], p0[3];
     real_t R0[3], R_m[3], R_p[3], d;
     vector_t<real_t> n;
 };
@@ -38,7 +38,7 @@ projection_3d_t get_projection_3d(const vector_t<real_t> v1, const vector_t<real
     const vector_t<real_t> v3, const vector_t<real_t> v4, const vector_t<real_t> p);
 
 void get_projection_2d_edge(const vector_t<real_t> v1, const vector_t<real_t> v2,
-    const vector_t<real_t> v3, const vector_t<real_t> p, projection_1d_t &para_1d,
+    const vector_t<real_t> v3, const vector_t<real_t> p, projection_1d_t &para_1d, vector_t<real_t> &p0, 
     real_t &d, real_t &R0, real_t &R_m, real_t &R_p, vector_t<real_t> &u, vector_t<real_t> &n);
 void get_projection_3d_triangle(const vector_t<real_t> v1, const vector_t<real_t> v2,
     const vector_t<real_t> v3, const vector_t<real_t> p, vector_t<real_t> &n,

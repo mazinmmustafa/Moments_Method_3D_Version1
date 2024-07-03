@@ -281,13 +281,9 @@ complex_t dummy(const complex_t z){
     return 2.0*z;
 }
 
-void test_engine(){
+void test_engine_2d(){
 
-    // shape_t shape;
-    // shape.get_mesh();
-    // shape.get_basis_functions();
-
-    engine_t engine;
+    engine_2d_t engine;
     timer_lib_t timer;
 
     quadl_domain_t quadl;
@@ -295,21 +291,23 @@ void test_engine(){
     const real_t tol=1.0E-4;
 
     quadl.set_2d(k_max, tol);
-    int flag;
     const complex_t k=2.0*pi;
     const complex_t eta=sqrt(mu_0/eps_0);
-    const complex_t j=complex_t(0.0, 1.0);
 
     vector_t<real_t> v1_m, v2_m, v3_m, v4_m;
+    vector_t<real_t> v1_n, v2_n, v3_n, v4_n;
+
+    // Scenario I
+
     v1_m.x = +0.0; 
-    v1_m.y = -0.1; 
+    v1_m.y = -0.4; 
     v1_m.z = +0.0;
 
     v2_m.x = +0.0; 
     v2_m.y = +0.2; 
     v2_m.z = +0.0;
 
-    v3_m.x = +0.2; 
+    v3_m.x = +0.1; 
     v3_m.y = +0.0; 
     v3_m.z = +0.0;
 
@@ -317,18 +315,124 @@ void test_engine(){
     v4_m.y = +0.0; 
     v4_m.z = +0.0;
 
-    basis_2d_t basis_m(v1_m, v2_m, v3_m, v4_m), basis_n(v1_m, v2_m, v3_m, v4_m);
+    
+    v1_n.x = +0.0; 
+    v1_n.y = -0.4; 
+    v1_n.z = +0.0;
+
+    v2_n.x = +0.0; 
+    v2_n.y = +0.2; 
+    v2_n.z = +0.0;
+
+    v3_n.x = +0.1; 
+    v3_n.y = +0.0; 
+    v3_n.z = +0.0;
+
+    v4_n.x = -0.3; 
+    v4_n.y = +0.0; 
+    v4_n.z = +0.0;
+
+    // Scenario II Case I
+
+    // v1_m.x = +0.0; 
+    // v1_m.y = -0.1; 
+    // v1_m.z = +0.0;
+
+    // v2_m.x = +0.0; 
+    // v2_m.y = +0.2; 
+    // v2_m.z = +0.0;
+
+    // v3_m.x = +0.3; 
+    // v3_m.y = +0.0; 
+    // v3_m.z = +0.0;
+
+    // v4_m.x = -0.2; 
+    // v4_m.y = +0.0; 
+    // v4_m.z = +0.0;
+
+    
+    // v1_n.x = +0.2; 
+    // v1_n.y = +0.3; 
+    // v1_n.z = +0.0;
+
+    // v2_n.x = -0.2; 
+    // v2_n.y = +0.0; 
+    // v2_n.z = +0.0;
+
+    // v3_n.x = +0.0; 
+    // v3_n.y = +0.2; 
+    // v3_n.z = +0.0;
+
+    // v4_n.x = +0.3; 
+    // v4_n.y = +0.0; 
+    // v4_n.z = +0.0;
+
+    // Scenario II Case II
+
+    // v1_m.x = +0.0; 
+    // v1_m.y = -0.1; 
+    // v1_m.z = +0.0;
+
+    // v2_m.x = +0.0; 
+    // v2_m.y = +0.2; 
+    // v2_m.z = +0.0;
+
+    // v3_m.x = +0.3; 
+    // v3_m.y = +0.0; 
+    // v3_m.z = +0.0;
+
+    // v4_m.x = -0.2; 
+    // v4_m.y = +0.0; 
+    // v4_m.z = +0.0;
+
+    
+    // v1_n.x = -0.1; 
+    // v1_n.y = +0.2; 
+    // v1_n.z = +0.0;
+
+    // v2_n.x = +0.3; 
+    // v2_n.y = +0.0; 
+    // v2_n.z = +0.0;
+
+    // v3_n.x = -0.2; 
+    // v3_n.y = +0.0; 
+    // v3_n.z = +0.0;
+
+    // v4_n.x = +0.0; 
+    // v4_n.y = +0.2; 
+    // v4_n.z = +0.0;
+
+    basis_2d_t basis_m(v1_m, v2_m, v3_m, v4_m), basis_n(v1_n, v2_n, v3_n, v4_n);
 
     timer.set();
-    print((-j*eta/k)*phi_2d(basis_m, basis_n, k, quadl, flag));
+    print(Z_mn_2d(basis_m, basis_n, k, eta, quadl));
     timer.unset();
-    print(flag);
 
     quadl.unset_2d();
 
 }
 
 
+void test_Z_mn_2d(){
+
+    timer_lib_t timer;
+
+    engine_2d_t engine;  
+    engine.shape.get_mesh();
+    engine.shape.get_basis_functions();
+    engine.shape.set_medium(mu_0, eps_0);
+
+    const size_t k_max=10;
+    const real_t tol=1.0E-3;
+    engine.quadl.set_2d(k_max, tol);
+
+    timer.set();
+    engine.compute_Z_mn();
+    timer.unset();
+
+    engine.quadl.unset_2d();
+
+}
 
 
 

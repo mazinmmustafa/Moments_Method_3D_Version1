@@ -19,7 +19,7 @@ projection_1d_t get_projection_1d(const vector_t<real_t> v1, const vector_t<real
 }
 
 void get_projection_2d_edge(const vector_t<real_t> v1, const vector_t<real_t> v2,
-    const vector_t<real_t> v3, const vector_t<real_t> p, projection_1d_t &para_1d,
+    const vector_t<real_t> v3, const vector_t<real_t> p, projection_1d_t &para_1d, vector_t<real_t> &p0_, 
     real_t &d, real_t &R0, real_t &R_m, real_t &R_p, vector_t<real_t> &u, vector_t<real_t> &n){
     vector_t<real_t> v21=v2-v1;
     vector_t<real_t> v31=v3-v1;
@@ -27,6 +27,7 @@ void get_projection_2d_edge(const vector_t<real_t> v1, const vector_t<real_t> v2
     real_t alpha=((v21*v31)*v31-(v31*v31)*v21)*(v1-p)/((v21*v21)*(v31*v31)-(v21*v31)*(v21*v31));
     real_t beta =((v21*v31)*v21-(v21*v21)*v31)*(v1-p)/((v21*v21)*(v31*v31)-(v21*v31)*(v21*v31));
     vector_t<real_t> p0=v1+alpha*v21+beta*v31;
+    p0_ = p0;
     para_1d = get_projection_1d(v1, v2, p0);
     d = mag(p-p0);
     R0 = mag(p-para_1d.p0);
@@ -39,13 +40,13 @@ void get_projection_2d_edge(const vector_t<real_t> v1, const vector_t<real_t> v2
 projection_2d_t get_projection_2d(const vector_t<real_t> v1, const vector_t<real_t> v2,
     const vector_t<real_t> v3, const vector_t<real_t> p){
     projection_2d_t para_2d;
-    get_projection_2d_edge(v2, v3, v1, p, para_2d.para_1d[0],
+    get_projection_2d_edge(v2, v3, v1, p, para_2d.para_1d[0], para_2d.p0[0],
         para_2d.d, para_2d.R0[0], para_2d.R_m[0], 
         para_2d.R_p[0], para_2d.u[0], para_2d.n);
-    get_projection_2d_edge(v3, v1, v2, p, para_2d.para_1d[1],
+    get_projection_2d_edge(v3, v1, v2, p, para_2d.para_1d[1], para_2d.p0[1],
         para_2d.d, para_2d.R0[1], para_2d.R_m[1], 
         para_2d.R_p[1], para_2d.u[1], para_2d.n);
-    get_projection_2d_edge(v1, v2, v3, p, para_2d.para_1d[2],
+    get_projection_2d_edge(v1, v2, v3, p, para_2d.para_1d[2], para_2d.p0[2],
         para_2d.d, para_2d.R0[2], para_2d.R_m[2], 
         para_2d.R_p[2], para_2d.u[2], para_2d.n);
     return para_2d;

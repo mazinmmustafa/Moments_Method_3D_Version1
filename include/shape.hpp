@@ -147,6 +147,14 @@ struct basis_3d_t{
     }
 };
 
+struct shape_info_t{
+    size_t N_1d_basis, N_2d_basis, N_3d_basis;
+    int is_basis_1d_list_allocated; 
+    int is_basis_2d_list_allocated;  
+    int is_basis_3d_list_allocated;
+    complex_t k, eta;
+};
+
 class shape_t{
     private:
         size_t N_points=0, N_edges=0, N_triangles=0, N_tetrahedrons=0;
@@ -166,17 +174,25 @@ class shape_t{
         basis_2d_t *basis_2d_list=null;
         basis_3d_t *basis_3d_list=null;
         void free_basic_elements();
+        complex_t mu, eps;
+        complex_t k, eta;
     public:
         shape_t();
         ~shape_t();
         void get_mesh();
         void load_mesh();
         void log_mesh();
+        edge_t get_edge_element(const size_t index);
         triangle_t get_triangle_element(const size_t index);
         tetrahedron_t get_tetrahedron_element(const size_t index);
+        basis_1d_t get_basis_1d(const size_t index);
+        basis_2d_t get_basis_2d(const size_t index);
+        basis_3d_t get_basis_3d(const size_t index);
         void assign_volume_properties(const complex_t eps, const int_t physical_group);
         void get_basis_functions();
         void load_basis_functions();
+        shape_info_t get_shape_info();
+        void set_medium(const complex_t mu, const complex_t eps);
 };
 
 // Functions

@@ -258,48 +258,61 @@ complex_t quadl_t::integral_3d(complex_t (*func)(const complex_t, const complex_
 
 // 1d line domain
 
-// complex_t quadl_domain_t::quadl_1d(complex_t (*func)(const complex_t, void*), 
-//     void *args, line_domain_t line){
-//     real_t L=line.length();
-//     complex_t sum=0.0;
-//     const size_t N=3;
-//     const real_t alpha_n[N]={(1.0-sqrt(3.0/5.0))/2.0, 1.0/2.0, (1.0+sqrt(3.0/5.0))/2.0};
-//     const real_t w_n[N]={5.0/18.0, 8.0/18.0, 5.0/18.0};
-//     for (size_t n=0; n<N; n++){
-//         sum+=w_n[n]*func(line.v1.x+alpha_n[n]*(line.v2.x-line.v1.x), args);
-//     }
-//     return L*sum;
-// }
+void quadl_domain_t::set_1d(const size_t k_max, const real_t tol){
+    this->k_max_1d = k_max;
+    this->tol_1d = tol;
+    this->x_1d = (real_t*)calloc(this->N_1d, sizeof(real_t));
+    this->w_1d = (real_t*)calloc(this->N_1d, sizeof(real_t));
+    assert(this->x_1d!=null);
+    assert(this->w_1d!=null);
+    this->is_1d_allocated = true;
+    cgqf_f77_(&this->rule_1d, &this->N_1d, this->x_1d, this->w_1d);
+    // for (size_t i=0; i<(size_t)this->N_1d; i++){
+    //     print("%21.14E %21.14E\n", this->x_1d[i], this->w_1d[i]);
+    // }
+}
 
-// complex_t quadl_domain_t::quadl_1d_(complex_t (*func)(const complex_t, void*), 
-//     void *args, const line_domain_t line, size_t &k, const complex_t I_p){
-//     if (k>this->k_max){return I_p;}
-//     vector_t<real_t> m=0.5*(line.v1+line.v2);
-//     line_domain_t line_1={line.v1, m};
-//     line_domain_t line_2={m, line.v2};
-//     complex_t I1=quadl_domain_t::quadl_1d(func, args, line_1);
-//     complex_t I2=quadl_domain_t::quadl_1d(func, args, line_2);
-//     complex_t I_n=I1+I2;
-//     real_t error=abs(I_n-I_p);
-//     size_t k1=k, k2=k;
-//     if (error>this->tol*abs(I_n)&&k<this->k_max&&error>0.0){
-//         k++;
-//         I1 = quadl_domain_t::quadl_1d_(func, args, line_1, ++k1, I1);
-//         I2 = quadl_domain_t::quadl_1d_(func, args, line_2, ++k2, I2);
-//         I_n = I1+I2;
-//         k = max_size_t(k1, k2);
-//     }
-//     return I_n;
-// }
+complex_t quadl_domain_t::quadl_1d(complex_t (*func)(const complex_t, void*), 
+    void *args, line_domain_t line){
+    real_t L=line.length();
+    complex_t sum=0.0;
+    real_t alpha;
+    for (size_t n=0; n<(size_t)this->N_1d; n++){
+        alpha = line.v1.x+(line.v2.x-line.v1.x)*this->x_1d[n];
+        sum+=this->w_1d[n]*func(alpha, args);
+    }
+    return L*sum;
+}
 
-// complex_t quadl_domain_t::integral_1d(complex_t (*func)(const complex_t, void*), 
-//     void *args, const line_domain_t line, int &flag){
-//     flag = false;
-//     size_t k=0;
-//     complex_t ans=quadl_domain_t::quadl_1d_(func, args, line, k, 0.0);
-//     if (k>=this->k_max){flag = true;}
-//     return ans;
-// }
+complex_t quadl_domain_t::quadl_1d_(complex_t (*func)(const complex_t, void*), 
+    void *args, const line_domain_t line, size_t &k, const complex_t I_p){
+    if (k>this->k_max_1d){return I_p;}
+    vector_t<real_t> m=0.5*(line.v1+line.v2);
+    line_domain_t line_1={line.v1, m};
+    line_domain_t line_2={m, line.v2};
+    complex_t I1=quadl_domain_t::quadl_1d(func, args, line_1);
+    complex_t I2=quadl_domain_t::quadl_1d(func, args, line_2);
+    complex_t I_n=I1+I2;
+    real_t error=abs(I_n-I_p);
+    size_t k1=k, k2=k;
+    if (error>this->tol_1d*abs(I_n)&&k<this->k_max_1d&&error>0.0){
+        k++;
+        I1 = quadl_domain_t::quadl_1d_(func, args, line_1, ++k1, I1);
+        I2 = quadl_domain_t::quadl_1d_(func, args, line_2, ++k2, I2);
+        I_n = I1+I2;
+        k = max_size_t(k1, k2);
+    }
+    return I_n;
+}
+
+complex_t quadl_domain_t::integral_1d(complex_t (*func)(const complex_t, void*), 
+    void *args, const line_domain_t line, int &flag){
+    flag = false;
+    size_t k=0;
+    complex_t ans=quadl_domain_t::quadl_1d_(func, args, line, k, 0.0);
+    if (k>=this->k_max_1d){flag = true;}
+    return ans;
+}
 
 // 2d domain triangle
 
