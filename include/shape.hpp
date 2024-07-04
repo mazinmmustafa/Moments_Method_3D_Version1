@@ -9,7 +9,7 @@
 
 // Definitions
 
-const real_t tol_vertex=1.0E-4;
+const real_t tol_vertex=1.0E-6;
 
 struct edge_t{
     vector_t<real_t> v[2];
@@ -177,7 +177,7 @@ class shape_t{
     public:
         complex_t mu, eps;
         complex_t k, eta;
-        real_t freq;
+        real_t freq, lambda;
         shape_t();
         ~shape_t();
         void get_mesh();

@@ -1,6 +1,8 @@
 //
 #include "quadl.hpp"
 
+const real_t eps_zero=1.0E-14;
+
 size_t max_size_t(const size_t a, const size_t b){
     return a>b ? a : b;
 }
@@ -295,7 +297,7 @@ complex_t quadl_domain_t::quadl_1d_(complex_t (*func)(const complex_t, void*),
     complex_t I_n=I1+I2;
     real_t error=abs(I_n-I_p);
     size_t k1=k, k2=k;
-    if (error>this->tol_1d*abs(I_n)&&k<this->k_max_1d&&error>0.0){
+    if (error>this->tol_1d*abs(I_n)&&k<this->k_max_1d&&error>0.0&&abs(I_n)>eps_zero){
         k++;
         I1 = quadl_domain_t::quadl_1d_(func, args, line_1, ++k1, I1);
         I2 = quadl_domain_t::quadl_1d_(func, args, line_2, ++k2, I2);
@@ -370,7 +372,7 @@ complex_t quadl_domain_t::quadl_2d_(complex_t (*func)(const complex_t, const com
     complex_t I_n=I1+I2;
     real_t error=abs(I_n-I_p);
     size_t k1=k, k2=k;
-    if (error>this->tol_2d*abs(I_n)&&error>0.0){
+    if (error>this->tol_2d*abs(I_n)&&error>0.0&&abs(I_n)>eps_zero){
         I1 = quadl_domain_t::quadl_2d_(func, args, triangle_1, ++k1, I1);
         I2 = quadl_domain_t::quadl_2d_(func, args, triangle_2, ++k2, I2);
         I_n = I1+I2;
@@ -384,7 +386,7 @@ complex_t quadl_domain_t::integral_2d(complex_t (*func)(const complex_t, const c
     flag = false;
     size_t k=0;
     complex_t ans=quadl_domain_t::quadl_2d_(func, args, triangle, k, 0.0);
-    if (k>=this->k_max_2d){flag = true;}
+    if (k>=this->k_max_2d){flag = true; print(ans);}
     return ans;
 }
 
@@ -475,7 +477,7 @@ complex_t quadl_domain_t::integral_2d(complex_t (*func)(const complex_t, const c
 //     complex_t I_n=I1+I2+I3+I4+I5+I6+I7;
 //     real_t error=abs(I_n-I_p);
 //     size_t k1=k, k2=k, k3=k, k4=k, k5=k, k6=k, k7=k;
-//     if (error>this->tol*abs(I_n)&&error>0.0){
+//     if (error>this->tol*abs(I_n)&&error>0.0&&abs(I_n)>eps_zero){
 //         k++;
 //         I1 = quadl_domain_t::quadl_3d_(func, args, tetrahedron_1, ++k1, I1);
 //         I2 = quadl_domain_t::quadl_3d_(func, args, tetrahedron_2, ++k2, I2);

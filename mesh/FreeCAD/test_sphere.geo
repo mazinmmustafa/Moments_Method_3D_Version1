@@ -1,4 +1,4 @@
-Merge "test_shape.brep";
+Merge "test_sphere.brep";
 //+
 Physical Surface("Surface", 1) = {1};
 //+

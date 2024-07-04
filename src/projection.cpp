@@ -24,8 +24,10 @@ void get_projection_2d_edge(const vector_t<real_t> v1, const vector_t<real_t> v2
     vector_t<real_t> v21=v2-v1;
     vector_t<real_t> v31=v3-v1;
     vector_t<real_t> v32=v3-v2;
-    real_t alpha=((v21*v31)*v31-(v31*v31)*v21)*(v1-p)/((v21*v21)*(v31*v31)-(v21*v31)*(v21*v31));
-    real_t beta =((v21*v31)*v21-(v21*v21)*v31)*(v1-p)/((v21*v21)*(v31*v31)-(v21*v31)*(v21*v31));
+    real_t a1=v21*v21; real_t a2=v21*v31; real_t a3=v21*(v1-p);
+    real_t b1=v31*v31; real_t b2=v31*v21; real_t b3=v31*(v1-p);
+    real_t alpha=(a2*b3-b1*a3)/(a1*b1-a2*b2);
+    real_t beta=(b2*a3-a1*b3)/(a1*b1-a2*b2);
     vector_t<real_t> p0=v1+alpha*v21+beta*v31;
     p0_ = p0;
     para_1d = get_projection_1d(v1, v2, p0);

@@ -436,6 +436,12 @@ void shape_t::free_basic_elements(){
 }
 
 void shape_t::load_basis_functions(){   
+    file_t file;
+    file.open("mesh/basis/basis_info.txt", 'r');
+    file.read("%zu", &this->N_1d_basis);
+    file.read("%zu", &this->N_2d_basis);
+    file.read("%zu", &this->N_3d_basis);
+    file.close();
     this->basis_1d_list = (basis_1d_t*)calloc(this->N_1d_basis, sizeof(basis_1d_t));
     this->basis_2d_list = (basis_2d_t*)calloc(this->N_2d_basis, sizeof(basis_2d_t));
     this->basis_3d_list = (basis_3d_t*)calloc(this->N_3d_basis, sizeof(basis_3d_t));
@@ -447,7 +453,6 @@ void shape_t::load_basis_functions(){
     this->is_basis_3d_list_allocated = true;
     basis_2d_t basis_2d;
     basis_3d_t basis_3d;
-    file_t file;
     //
     file.open("mesh/basis/basis_1d.txt", 'r');
     for (size_t i=0; i<this->N_1d_basis; i++){
@@ -485,6 +490,12 @@ void shape_t::load_basis_functions(){
         file.read("%lf", &basis_2d.r_p.z);
         file.read("%d", &basis_2d.physical_group_m);
         file.read("%d", &basis_2d.physical_group_p);
+        
+        basis_2d.r_m=basis_2d.r_m*this->lambda;
+        basis_2d.r_p=basis_2d.r_p*this->lambda;
+        basis_2d.e_1=basis_2d.e_1*this->lambda;
+        basis_2d.e_2=basis_2d.e_2*this->lambda;
+
         basis_2d.get_values();
         this->basis_2d_list[i] = basis_2d;
     }
@@ -519,7 +530,7 @@ void shape_t::load_basis_functions(){
 shape_info_t shape_t::get_shape_info(){
     shape_info_t shape_info={this->N_1d_basis, this->N_2d_basis, this->N_3d_basis, 
         this->is_basis_1d_list_allocated, this->is_basis_2d_list_allocated, this->is_basis_3d_list_allocated,
-        this->mu, this->eps};
+        this->k, this->eta};
     return shape_info;
 }
 
@@ -530,4 +541,5 @@ void shape_t::set_medium(const complex_t mu, const complex_t eps, const real_t f
     this->eta = sqrt(mu_0/eps_0)*sqrt(mu/eps);
     assert_error(freq>0.0, "invalid frequency");
     this->freq = freq;
+    this->lambda = (c_0/freq)/real(sqrt(eps*mu));
 }

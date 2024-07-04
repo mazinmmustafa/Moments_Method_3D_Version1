@@ -357,7 +357,7 @@ complex_t Z_mn_2d(const basis_2d_t basis_m, const basis_2d_t basis_n, const comp
     const complex_t eta, quadl_domain_t quadl){
     int flag=false;
     complex_t psi=psi_2d(basis_m, basis_n, k, quadl, flag); if(flag){flag=false; print("warning: no convergence!\n");}
-    complex_t phi=+phi_2d(basis_m, basis_n, k, quadl, flag); if(flag){flag=false; print("warning: no convergence!\n");}
+    complex_t phi=phi_2d(basis_m, basis_n, k, quadl, flag); if(flag){flag=false; print("warning: no convergence!\n");}
     const complex_t j=complex_t(0.0, 1.0);
     return j*k*eta*psi-j*(eta/k)*phi;
 }
@@ -369,25 +369,27 @@ complex_t integrand_V_plane_wave_2d(const complex_t alpha_m, const complex_t bet
     real_t phi_i=args->phi_i;
     complex_t k=args->k;
     const complex_t j=complex_t(0.0, 1.0);
-    vector_t<complex_t> rho_m=+1.0*(alpha_m*basis_m.L_m1+beta_m*basis_m.L_m2);
-    vector_t<complex_t> rho_p=-1.0*(alpha_m*basis_m.L_p1+beta_m*basis_m.L_p2);
-    vector_t<complex_t> k_i(k*sin(theta_i)*cos(phi_i), 
-                            k*sin(theta_i)*sin(phi_i), 
-                            k*cos(theta_i));
+    vector_t<real_t> rho_m=+1.0*(real(alpha_m)*basis_m.L_m1+real(beta_m)*basis_m.L_m2);
+    vector_t<real_t> rho_p=-1.0*(real(alpha_m)*basis_m.L_p1+real(beta_m)*basis_m.L_p2);
+    vector_t<real_t> k_i(sin(theta_i)*cos(phi_i), 
+                         sin(theta_i)*sin(phi_i), 
+                         cos(theta_i));
     complex_t E_TM=args->E_TM;
     complex_t E_TE=args->E_TE;
-    complex_t k_i_r_m=k_i*(basis_m.r_m+basis_m.r_m);
-    complex_t k_i_r_p=k_i*(basis_m.r_p-basis_m.r_m);
+    complex_t k_i_r_m=k*(k_i*(basis_m.r_m+rho_m));
+    complex_t k_i_r_p=k*(k_i*(basis_m.r_p-rho_p));
     vector_t<real_t> theta_i_u(cos(theta_i)*cos(phi_i),
                                cos(theta_i)*sin(phi_i),
                                -sin(theta_i));
     vector_t<real_t> phi_i_u(-sin(phi_i), cos(phi_i), 0.0);
     //
-    vector_t<complex_t> xi_m=basis_m.L*exp(j*k_i_r_m)*rho_m;
-    vector_t<complex_t> xi_p=basis_m.L*exp(j*k_i_r_p)*rho_p;
-    complex_t I_TM=0.0, I_TE=0.0;
-    I_TM = E_TM*(xi_m+xi_p)*theta_i_u;
-    I_TE = E_TE*(xi_m+xi_p)*phi_i_u;
+    complex_t xi_m, xi_p;
+    xi_m = basis_m.L*exp(j*k_i_r_m)*(rho_m*theta_i_u);
+    xi_p = basis_m.L*exp(j*k_i_r_p)*(rho_p*theta_i_u);
+    complex_t I_TM=E_TM*(xi_m+xi_p);
+    xi_m = basis_m.L*exp(j*k_i_r_m)*(rho_m*phi_i_u);
+    xi_p = basis_m.L*exp(j*k_i_r_p)*(rho_p*phi_i_u);
+    complex_t I_TE=E_TE*(xi_m+xi_p);
     return I_TM+I_TE;
 }
 
@@ -417,6 +419,8 @@ engine_2d_t::~engine_2d_t(){
 
 }
 
+const size_t line_max=100;
+
 void engine_2d_t::compute_Z_mn(){
     shape_info_t shape_info=this->shape.get_shape_info();
     assert_error(shape_info.is_basis_2d_list_allocated, "no 2d elements were found");
@@ -427,7 +431,6 @@ void engine_2d_t::compute_Z_mn(){
     this->N = N;
     this->Z_mn.set(N, N);
     basis_2d_t basis_m, basis_n;
-    size_t line_max=100;
     char *msg=(char*)calloc(line_max, sizeof(char));
     print("total number of basis functions: %zu\n", N);
     size_t count=0;
@@ -482,7 +485,7 @@ void engine_2d_t::compute_V_m_plane_wave(const complex_t E_TM, const complex_t E
     shape_info_t shape_info=this->shape.get_shape_info();
     assert_error(shape_info.is_basis_2d_list_allocated, "no 2d elements were found");
     size_t N=shape_info.N_2d_basis;
-    complex_t k, eta;
+    complex_t k;
     k = shape_info.k;
     this->N = N;
     this->V_m.set(N, 1);
@@ -504,19 +507,19 @@ complex_t integrand_RCS_theta_2d(const complex_t alpha_n, const complex_t beta_n
     real_t phi_s=args->phi_s;
     complex_t k=args->k;
     const complex_t j=complex_t(0.0, 1.0);
-    vector_t<complex_t> rho_m=+1.0*(alpha_n*basis_n.L_m1+beta_n*basis_n.L_m2);
-    vector_t<complex_t> rho_p=-1.0*(alpha_n*basis_n.L_p1+beta_n*basis_n.L_p2);
-    vector_t<complex_t> k_s(k*sin(theta_s)*cos(phi_s), 
-                            k*sin(theta_s)*sin(phi_s), 
-                            k*cos(theta_s));
-    complex_t k_s_r_m=k_s*(basis_n.r_m+basis_n.r_m);
-    complex_t k_s_r_p=k_s*(basis_n.r_p-basis_n.r_m);
+    vector_t<real_t> rho_m=+1.0*(real(alpha_n)*basis_n.L_m1+real(beta_n)*basis_n.L_m2);
+    vector_t<real_t> rho_p=-1.0*(real(alpha_n)*basis_n.L_p1+real(beta_n)*basis_n.L_p2);
+    vector_t<real_t> k_s(sin(theta_s)*cos(phi_s), 
+                         sin(theta_s)*sin(phi_s), 
+                         cos(theta_s));
+    complex_t k_s_r_m=k*(k_s*(basis_n.r_m+rho_m));
+    complex_t k_s_r_p=k*(k_s*(basis_n.r_p-rho_p));
     vector_t<real_t> theta_s_u(cos(theta_s)*cos(phi_s),
                                cos(theta_s)*sin(phi_s),
                                -sin(theta_s));
     //
-    complex_t xi_m=basis_n.L*exp(j*k_s_r_m)*rho_m*theta_s_u;
-    complex_t xi_p=basis_n.L*exp(j*k_s_r_p)*rho_p*theta_s_u;
+    complex_t xi_m=basis_n.L*exp(j*k_s_r_m)*(rho_m*theta_s_u);
+    complex_t xi_p=basis_n.L*exp(j*k_s_r_p)*(rho_p*theta_s_u);
     return xi_m+xi_p;
 }
 
@@ -527,17 +530,17 @@ complex_t integrand_RCS_phi_2d(const complex_t alpha_n, const complex_t beta_n, 
     real_t phi_s=args->phi_s;
     complex_t k=args->k;
     const complex_t j=complex_t(0.0, 1.0);
-    vector_t<complex_t> rho_m=+1.0*(alpha_n*basis_n.L_m1+beta_n*basis_n.L_m2);
-    vector_t<complex_t> rho_p=-1.0*(alpha_n*basis_n.L_p1+beta_n*basis_n.L_p2);
-    vector_t<complex_t> k_s(k*sin(theta_s)*cos(phi_s), 
-                            k*sin(theta_s)*sin(phi_s), 
-                            k*cos(theta_s));
-    complex_t k_s_r_m=k_s*(basis_n.r_m+basis_n.r_m);
-    complex_t k_s_r_p=k_s*(basis_n.r_p-basis_n.r_m);
+    vector_t<real_t> rho_m=+1.0*(real(alpha_n)*basis_n.L_m1+real(beta_n)*basis_n.L_m2);
+    vector_t<real_t> rho_p=-1.0*(real(alpha_n)*basis_n.L_p1+real(beta_n)*basis_n.L_p2);
+    vector_t<real_t> k_s(sin(theta_s)*cos(phi_s), 
+                         sin(theta_s)*sin(phi_s), 
+                         cos(theta_s));
+    complex_t k_s_r_m=k*(k_s*(basis_n.r_m+rho_m));
+    complex_t k_s_r_p=k*(k_s*(basis_n.r_p-rho_p));
     vector_t<real_t> phi_s_u(-sin(phi_s), cos(phi_s), 0.0);
     //
-    complex_t xi_m=basis_n.L*exp(j*k_s_r_m)*rho_m*phi_s_u;
-    complex_t xi_p=basis_n.L*exp(j*k_s_r_p)*rho_p*phi_s_u;
+    complex_t xi_m=basis_n.L*exp(j*k_s_r_m)*(rho_m*phi_s_u);
+    complex_t xi_p=basis_n.L*exp(j*k_s_r_p)*(rho_p*phi_s_u);
     return xi_m+xi_p;
 }
 
