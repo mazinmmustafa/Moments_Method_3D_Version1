@@ -55,4 +55,17 @@ vector_t<real_t> unit(const vector_t<real_t> A);
 
 int is_equal(const vector_t<real_t> A, const vector_t<real_t> B, const real_t tol);
 
+//
+vector_t<complex_t> operator + (const vector_t<real_t> A, const vector_t<complex_t> B);
+vector_t<complex_t> operator + (const vector_t<complex_t> A, const vector_t<real_t> B);
+vector_t<complex_t> operator - (const vector_t<real_t> A, const vector_t<complex_t> B);
+vector_t<complex_t> operator - (const vector_t<complex_t> A, const vector_t<real_t> B);
+vector_t<complex_t> operator ^ (const vector_t<real_t> A, const vector_t<complex_t> B);
+vector_t<complex_t> operator ^ (const vector_t<complex_t> A, const vector_t<real_t> B);
+complex_t operator * (const vector_t<real_t> A, const vector_t<complex_t> B);
+complex_t operator * (const vector_t<complex_t> A, const vector_t<real_t> B);
+vector_t<complex_t> operator * (const complex_t a, const vector_t<real_t> A);
+vector_t<complex_t> operator * (const vector_t<real_t> A, const complex_t a);
+vector_t<complex_t> operator / (const vector_t<real_t> A, const complex_t a);
+
 #endif

@@ -78,7 +78,7 @@ class quadl_domain_t{
         // 2d
         size_t k_max_2d=0;
         real_t tol_2d=1.0E-4;
-        int rule_2d=9, N_2d=19;
+        int rule_2d=3, N_2d=4;
         real_t *x_2d=null, *y_2d=null, *w_2d=null;
         int is_2d_allocated=false;
         // 3d

@@ -174,9 +174,10 @@ class shape_t{
         basis_2d_t *basis_2d_list=null;
         basis_3d_t *basis_3d_list=null;
         void free_basic_elements();
+    public:
         complex_t mu, eps;
         complex_t k, eta;
-    public:
+        real_t freq;
         shape_t();
         ~shape_t();
         void get_mesh();
@@ -192,7 +193,23 @@ class shape_t{
         void get_basis_functions();
         void load_basis_functions();
         shape_info_t get_shape_info();
-        void set_medium(const complex_t mu, const complex_t eps);
+        void set_medium(const complex_t mu, const complex_t eps, const real_t freq);
+        void mesh_2d(const char *gmsh_filename, const real_t clmax){
+            int_t return_value;
+            char *cmd=(char*)calloc(200, sizeof(char));
+            sprintf(cmd, "gmsh mesh/%s -2 -clmax %0.4f -format vtk -save_all -o mesh/shape.vtk", 
+                gmsh_filename, clmax);
+            return_value = system(cmd);
+            assert_error(return_value==0, "failed to call gmsh");
+        }
+        void mesh_3d(const char *gmsh_filename, const real_t clmax){
+            int_t return_value;
+            char *cmd=(char*)calloc(200, sizeof(char));
+            sprintf(cmd, "gmsh mesh/%s -3 -clmax %0.4f -format vtk -save_all -o mesh/shape.vtk", 
+                gmsh_filename, clmax);
+            return_value = system(cmd);
+            assert_error(return_value==0, "failed to call gmsh");
+        }
 };
 
 // Functions

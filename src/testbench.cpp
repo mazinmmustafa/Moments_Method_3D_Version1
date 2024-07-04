@@ -417,22 +417,76 @@ void test_Z_mn_2d(){
 
     timer_lib_t timer;
 
+    const real_t GHz=1.0E+9;
+    real_t freq=0.25*GHz;
+    real_t mu=1.0, eps=1.0;
+    real_t lambda=c_0/freq;
+
     engine_2d_t engine;  
+    const real_t clmax=0.06*lambda;
+    engine.shape.mesh_2d("FreeCAD/test_sphere.geo", clmax);
+
     engine.shape.get_mesh();
     engine.shape.get_basis_functions();
-    engine.shape.set_medium(mu_0, eps_0);
+    engine.shape.load_basis_functions();
+    engine.shape.set_medium(mu, eps, freq);
 
-    const size_t k_max=10;
+    const size_t k_max=25;
     const real_t tol=1.0E-3;
     engine.quadl.set_2d(k_max, tol);
 
-    timer.set();
-    engine.compute_Z_mn();
-    timer.unset();
+    // solve Z_mn
+    // timer.set();
+    // engine.compute_Z_mn();
+    // timer.unset();
+    // engine.save_Z_mn("data/Z_mn.bin");
+
+    // load Z_min
+    engine.load_Z_mn("data/Z_mn.bin");
+
+    real_t theta_i, phi_i;
+    complex_t E_TM, E_TE;
+
+    theta_i = deg2rad(90.0);
+    phi_i = deg2rad(180.0);
+    E_TM = 1.0;
+    E_TE = 0.0;
+
+    engine.compute_V_m_plane_wave(E_TM, E_TE, theta_i, phi_i);
+
+    print("solving for I_n...");
+    engine.Z_mn.lup();
+    engine.I_n.set(engine.N, 1);
+    engine.Z_mn.solve(engine.V_m, engine.I_n);
+    print(", done!\n");
+
+    RCS_2d RCS;
+    
+    real_t phi_s=deg2rad(0.0);
+    real_t theta_s_min=deg2rad(-180.0);
+    real_t theta_s_max=deg2rad(+180.0);
+    range_t theta_s;
+    const size_t Ns=401;
+    theta_s.set(theta_s_min, theta_s_max, Ns);
+    theta_s.linspace();
+
+    file_t file;
+    file.open("data/RCS.txt", 'w');
+
+    print("computing RCS...");
+    for (size_t i=0; i<Ns; i++){
+        RCS = engine.RCS_plane_wave_2d(theta_s(i), phi_s);
+        file.write("%21.14E %21.14E %21.14E\n", theta_s(i), RCS.sigma_theta*(lambda*lambda), 
+            RCS.sigma_phi*(lambda*lambda));
+    }
+    print(", done!\n");
+
+    file.close();
 
     engine.quadl.unset_2d();
 
 }
+
 
 
 

@@ -29,9 +29,12 @@ void g_mn_2d(const real_t alpha_m, const real_t beta_m, const real_t alpha_n, co
 
 struct integrand_2d_args{
     basis_2d_t basis_m, basis_n;
-    complex_t k;
+    complex_t k=0.0;
     quadl_domain_t quadl;
-    complex_t alpha_m, beta_m;
+    complex_t alpha_m=0.0, beta_m=0.0;
+    real_t theta_i=0.0, phi_i=0.0;
+    real_t theta_s=0.0, phi_s=0.0;
+    complex_t E_TM=0.0, E_TE=0.0;
 };
 
 // phi terms
@@ -359,6 +362,51 @@ complex_t Z_mn_2d(const basis_2d_t basis_m, const basis_2d_t basis_n, const comp
     return j*k*eta*psi-j*(eta/k)*phi;
 }
 
+complex_t integrand_V_plane_wave_2d(const complex_t alpha_m, const complex_t beta_m, void *args_){
+    integrand_2d_args *args=(integrand_2d_args*)args_;
+    basis_2d_t basis_m=args->basis_m;
+    real_t theta_i=args->theta_i;
+    real_t phi_i=args->phi_i;
+    complex_t k=args->k;
+    const complex_t j=complex_t(0.0, 1.0);
+    vector_t<complex_t> rho_m=+1.0*(alpha_m*basis_m.L_m1+beta_m*basis_m.L_m2);
+    vector_t<complex_t> rho_p=-1.0*(alpha_m*basis_m.L_p1+beta_m*basis_m.L_p2);
+    vector_t<complex_t> k_i(k*sin(theta_i)*cos(phi_i), 
+                            k*sin(theta_i)*sin(phi_i), 
+                            k*cos(theta_i));
+    complex_t E_TM=args->E_TM;
+    complex_t E_TE=args->E_TE;
+    complex_t k_i_r_m=k_i*(basis_m.r_m+basis_m.r_m);
+    complex_t k_i_r_p=k_i*(basis_m.r_p-basis_m.r_m);
+    vector_t<real_t> theta_i_u(cos(theta_i)*cos(phi_i),
+                               cos(theta_i)*sin(phi_i),
+                               -sin(theta_i));
+    vector_t<real_t> phi_i_u(-sin(phi_i), cos(phi_i), 0.0);
+    //
+    vector_t<complex_t> xi_m=basis_m.L*exp(j*k_i_r_m)*rho_m;
+    vector_t<complex_t> xi_p=basis_m.L*exp(j*k_i_r_p)*rho_p;
+    complex_t I_TM=0.0, I_TE=0.0;
+    I_TM = E_TM*(xi_m+xi_p)*theta_i_u;
+    I_TE = E_TE*(xi_m+xi_p)*phi_i_u;
+    return I_TM+I_TE;
+}
+
+complex_t V_m_plane_wave_2d(const basis_2d_t basis_m, const complex_t E_TM, const complex_t E_TE, 
+    const complex_t k, const real_t theta_i, const real_t phi_i, quadl_domain_t quadl){
+    int flag=false;
+    integrand_2d_args args;
+    args.basis_m = basis_m;
+    args.k = k;
+    args.E_TM = E_TM;
+    args.E_TE = E_TE;
+    args.theta_i = theta_i;
+    args.phi_i = phi_i;
+    triangle_domain_t triangle={vector_t<real_t>(0.0, 0.0, 0.0), vector_t<real_t>(1.0, 0.0, 0.0), vector_t<real_t>(0.0, 1.0, 0.0)};
+    complex_t I_V=quadl.integral_2d(integrand_V_plane_wave_2d, &args, triangle, flag);
+    if(flag){flag=false; print("warning: no convergence!\n");}
+    return I_V;
+}
+
 //
 
 engine_2d_t::engine_2d_t(){
@@ -376,6 +424,7 @@ void engine_2d_t::compute_Z_mn(){
     complex_t k, eta;
     k = shape_info.k;
     eta = shape_info.eta;
+    this->N = N;
     this->Z_mn.set(N, N);
     basis_2d_t basis_m, basis_n;
     size_t line_max=100;
@@ -384,17 +433,133 @@ void engine_2d_t::compute_Z_mn(){
     size_t count=0;
     for (size_t m=0; m<N; m++){
         basis_m = this->shape.get_basis_2d(m);
-        for (size_t n=0; n<N; n++){
+        for (size_t n=m; n<N; n++){
             basis_n = this->shape.get_basis_2d(n);
-            sprintf(msg, "element (%zu, %zu)...", m, n);
-            progress_bar(count, N*N, msg);
+            sprintf(msg, "Z_mn (%zu, %zu)", m, n);
+            progress_bar(count, N*(N+1)/2, msg);
             this->Z_mn(m, n) = Z_mn_2d(basis_m, basis_n, k, eta, this->quadl);
             count++;
+        }
+        for (size_t n=m+1; n<N; n++){
+            basis_n = this->shape.get_basis_2d(n);
+            this->Z_mn(n, m) = this->Z_mn(m, n);
         }
     }
     free(msg);
 }
 
-// void engine_2d_t::save_Z_mn(const char *filename){
+void engine_2d_t::save_Z_mn(const char *filename){
+    binary_file_t file;
+    assert(filename!=null);
+    file.open(filename, 'w');
+    print(this->N);
+    file.write(&this->N);
+    for (size_t m=0; m<this->N; m++){
+        for (size_t n=0; n<this->N; n++){
+            file.write(&this->Z_mn(m, n));
+        }
+    }
+    file.close();
+}
 
-// }
+void engine_2d_t::load_Z_mn(const char *filename){
+    binary_file_t file;
+    assert(filename!=null);
+    file.open(filename, 'r');
+    file.read(&this->N);
+    this->Z_mn.unset();
+    this->Z_mn.set(this->N, this->N);
+    for (size_t m=0; m<this->N; m++){
+        for (size_t n=0; n<this->N; n++){
+            file.read(&this->Z_mn(m, n));
+        }
+    }
+    file.close();
+}
+
+void engine_2d_t::compute_V_m_plane_wave(const complex_t E_TM, const complex_t E_TE,
+    const real_t theta_i, const real_t phi_i){
+    shape_info_t shape_info=this->shape.get_shape_info();
+    assert_error(shape_info.is_basis_2d_list_allocated, "no 2d elements were found");
+    size_t N=shape_info.N_2d_basis;
+    complex_t k, eta;
+    k = shape_info.k;
+    this->N = N;
+    this->V_m.set(N, 1);
+    basis_2d_t basis_m;
+    size_t count=0;
+    for (size_t m=0; m<N; m++){
+        basis_m = this->shape.get_basis_2d(m);
+        this->V_m(m, 0) = V_m_plane_wave_2d(basis_m, E_TM, E_TE, k, theta_i, phi_i, this->quadl);
+        count++;
+    }
+}
+
+//
+
+complex_t integrand_RCS_theta_2d(const complex_t alpha_n, const complex_t beta_n, void *args_){
+    integrand_2d_args *args=(integrand_2d_args*)args_;
+    basis_2d_t basis_n=args->basis_n;
+    real_t theta_s=args->theta_s;
+    real_t phi_s=args->phi_s;
+    complex_t k=args->k;
+    const complex_t j=complex_t(0.0, 1.0);
+    vector_t<complex_t> rho_m=+1.0*(alpha_n*basis_n.L_m1+beta_n*basis_n.L_m2);
+    vector_t<complex_t> rho_p=-1.0*(alpha_n*basis_n.L_p1+beta_n*basis_n.L_p2);
+    vector_t<complex_t> k_s(k*sin(theta_s)*cos(phi_s), 
+                            k*sin(theta_s)*sin(phi_s), 
+                            k*cos(theta_s));
+    complex_t k_s_r_m=k_s*(basis_n.r_m+basis_n.r_m);
+    complex_t k_s_r_p=k_s*(basis_n.r_p-basis_n.r_m);
+    vector_t<real_t> theta_s_u(cos(theta_s)*cos(phi_s),
+                               cos(theta_s)*sin(phi_s),
+                               -sin(theta_s));
+    //
+    complex_t xi_m=basis_n.L*exp(j*k_s_r_m)*rho_m*theta_s_u;
+    complex_t xi_p=basis_n.L*exp(j*k_s_r_p)*rho_p*theta_s_u;
+    return xi_m+xi_p;
+}
+
+complex_t integrand_RCS_phi_2d(const complex_t alpha_n, const complex_t beta_n, void *args_){
+    integrand_2d_args *args=(integrand_2d_args*)args_;
+    basis_2d_t basis_n=args->basis_n;
+    real_t theta_s=args->theta_s;
+    real_t phi_s=args->phi_s;
+    complex_t k=args->k;
+    const complex_t j=complex_t(0.0, 1.0);
+    vector_t<complex_t> rho_m=+1.0*(alpha_n*basis_n.L_m1+beta_n*basis_n.L_m2);
+    vector_t<complex_t> rho_p=-1.0*(alpha_n*basis_n.L_p1+beta_n*basis_n.L_p2);
+    vector_t<complex_t> k_s(k*sin(theta_s)*cos(phi_s), 
+                            k*sin(theta_s)*sin(phi_s), 
+                            k*cos(theta_s));
+    complex_t k_s_r_m=k_s*(basis_n.r_m+basis_n.r_m);
+    complex_t k_s_r_p=k_s*(basis_n.r_p-basis_n.r_m);
+    vector_t<real_t> phi_s_u(-sin(phi_s), cos(phi_s), 0.0);
+    //
+    complex_t xi_m=basis_n.L*exp(j*k_s_r_m)*rho_m*phi_s_u;
+    complex_t xi_p=basis_n.L*exp(j*k_s_r_p)*rho_p*phi_s_u;
+    return xi_m+xi_p;
+}
+
+RCS_2d engine_2d_t::RCS_plane_wave_2d(const real_t theta_s, const real_t phi_s){
+    int flag=false;
+    integrand_2d_args args;
+    args.k = this->shape.k;
+    const complex_t eta=this->shape.eta;
+    args.theta_s = theta_s;
+    args.phi_s = phi_s;
+    RCS_2d RCS;
+    triangle_domain_t triangle={vector_t<real_t>(0.0, 0.0, 0.0), vector_t<real_t>(1.0, 0.0, 0.0), vector_t<real_t>(0.0, 1.0, 0.0)};
+    complex_t sigma_theta=0.0;
+    complex_t sigma_phi=0.0;
+    for (size_t n=0; n<this->N; n++){
+        args.basis_n = this->shape.get_basis_2d(n);
+        sigma_theta+=this->quadl.integral_2d(integrand_RCS_theta_2d, &args, triangle, flag)*this->I_n(n, 0);
+        if(flag){flag=false; print("warning: no convergence!\n");}
+        sigma_phi+=this->quadl.integral_2d(integrand_RCS_phi_2d, &args, triangle, flag)*this->I_n(n, 0);
+        if(flag){flag=false; print("warning: no convergence!\n");}
+    }
+    RCS.sigma_theta = pi*pow(abs(eta*sigma_theta), 2.0);
+    RCS.sigma_phi = pi*pow(abs(eta*sigma_phi), 2.0);
+    return RCS;
+}

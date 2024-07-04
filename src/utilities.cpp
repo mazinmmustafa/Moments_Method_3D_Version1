@@ -174,7 +174,7 @@ double timer_lib_t::get_elapsed(){
     return this->elapsed;
 }
 
-const real_t eps_sinc=1.0E-4;
+const real_t eps_sinc=1.0E-10;
 
 complex_t sinc(const complex_t x){
     return abs(x)<eps_sinc ? 1.0 : sin(x)/x;
@@ -182,4 +182,12 @@ complex_t sinc(const complex_t x){
 
 real_t sinc(const real_t x){
     return abs(x)<eps_sinc ? 1.0 : sin(x)/x;
+}
+
+real_t deg2rad(const real_t theta){
+    return theta*pi/180.0;
+}
+
+real_t rad2deg(const real_t theta){
+    return theta*180.0/pi;
 }

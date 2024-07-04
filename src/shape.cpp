@@ -523,9 +523,11 @@ shape_info_t shape_t::get_shape_info(){
     return shape_info;
 }
 
-void shape_t::set_medium(const complex_t mu, const complex_t eps){
+void shape_t::set_medium(const complex_t mu, const complex_t eps, const real_t freq){
     this->mu = mu;
     this->eps = eps;
-    this->k = 2.0*pi*sqrt(mu*eps);
-    this->eta = sqrt(mu/eps);
+    this->k = 2.0*pi*freq*sqrt(mu_0*eps_0)*sqrt(mu*eps);
+    this->eta = sqrt(mu_0/eps_0)*sqrt(mu/eps);
+    assert_error(freq>0.0, "invalid frequency");
+    this->freq = freq;
 }
