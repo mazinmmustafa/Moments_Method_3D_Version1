@@ -89,13 +89,13 @@ clean:
 	@$(RM) -rv $(BDIR)/$(EXE) $(ODIR)/*.o $(DDIR)/*.d 
 
 clean_mesh:
-	@$(RM) -rv $(BDIR)/$(EXE) $(ODIR)/*.o $(DDIR)/*.d 
+	@$(RM) -rv mesh/basis/* mesh/mesh/* mesh/shape.vtk
 
 clean_all: clean clean_mesh
 	@$(RM) -rv $(BDIR) $(ODIR) $(DDIR)
 
 clean_data:
-	@$(RM) -rv mesh/basis/* mesh/mesh/* mesh/shape.vtk
+	@$(RM) -rv data/*
 
 .PHONY: valgrind 
 
