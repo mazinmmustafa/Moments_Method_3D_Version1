@@ -102,6 +102,8 @@ clean_data:
 	@find ./figures/ -type f -name '*.log' | xargs $(RM) -rv
 	@find ./figures/ -type f -name '*.aux' | xargs $(RM) -rv
 	@find ./figures/ -type f -name '*.tex' | xargs $(RM) -rv
+	@find ./mesh/ -type f -name '*.FCBak' | xargs $(RM) -rv
+	@find . -type f -name 'octave-workspace' | xargs $(RM) -rv
 
 .PHONY: valgrind 
 
