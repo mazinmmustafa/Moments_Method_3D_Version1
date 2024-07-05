@@ -110,7 +110,7 @@ git_push: clean_all clean_data
 	git push --force --set-upstream $(GIT_URL)
 
 git_pull: clean_all
-	git pull $(GIT_URL)
+	git pull --force --set-downstream $(GIT_URL)
 
 gmsh:
 	@python3 mesh/generate_mesh.py
