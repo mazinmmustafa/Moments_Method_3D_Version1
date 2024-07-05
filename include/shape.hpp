@@ -153,6 +153,7 @@ struct shape_info_t{
     int is_basis_2d_list_allocated;  
     int is_basis_3d_list_allocated;
     complex_t k, eta;
+    real_t freq, lambda;
 };
 
 class shape_t{
@@ -168,16 +169,17 @@ class shape_t{
         int is_basis_2d_list_allocated=false;
         int is_basis_3d_list_allocated=false;
         void set();
-        void unset();
         size_t N_1d_basis=0, N_2d_basis=0, N_3d_basis=0;
         basis_1d_t *basis_1d_list=null;
         basis_2d_t *basis_2d_list=null;
         basis_3d_t *basis_3d_list=null;
         void free_basic_elements();
-    public:
         complex_t mu, eps;
         complex_t k, eta;
         real_t freq, lambda;
+        int is_medium_set=false;
+    public:
+        void unset();
         shape_t();
         ~shape_t();
         void get_mesh();
@@ -194,26 +196,13 @@ class shape_t{
         void load_basis_functions();
         shape_info_t get_shape_info();
         void set_medium(const complex_t mu, const complex_t eps, const real_t freq);
-        void mesh_2d(const char *gmsh_filename, const real_t clmax){
-            int_t return_value;
-            char *cmd=(char*)calloc(200, sizeof(char));
-            sprintf(cmd, "gmsh mesh/%s -2 -clmax %0.4f -format vtk -save_all -o mesh/shape.vtk", 
-                gmsh_filename, clmax);
-            return_value = system(cmd);
-            assert_error(return_value==0, "failed to call gmsh");
-        }
-        void mesh_3d(const char *gmsh_filename, const real_t clmax){
-            int_t return_value;
-            char *cmd=(char*)calloc(200, sizeof(char));
-            sprintf(cmd, "gmsh mesh/%s -3 -clmax %0.4f -format vtk -save_all -o mesh/shape.vtk", 
-                gmsh_filename, clmax);
-            return_value = system(cmd);
-            assert_error(return_value==0, "failed to call gmsh");
-        }
+        void mesh_1d(const char *gmsh_filename, const real_t clmax);
+        void mesh_2d(const char *gmsh_filename, const real_t clmax);
+        void mesh_3d(const char *gmsh_filename, const real_t clmax);
+        void check();
 };
 
 // Functions
 
-// gmsh mesh/shape.brep -3 -clmax 0.05 -format vtk -save_all -o mesh/shape.vtk
 
 #endif

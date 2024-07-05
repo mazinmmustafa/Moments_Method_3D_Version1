@@ -50,7 +50,7 @@ CDEP = $(patsubst $(ODIR)/%.o, $(DDIR)/%.d, $(COBJ))
 CXXDEPFLG = -MMD -MF $(patsubst $(ODIR)/%.o, $(DDIR)/%.d, $@) 
 
 # Targets
-.PHONY: build run clean clean_all
+.PHONY: build run clean clean_mesh clean_all
 
 build: $(BDIR) $(ODIR) $(DDIR) $(PDIR) $(BDIR)/$(EXE) 
 
@@ -88,11 +88,14 @@ $(ODIR)/%.o: $(SDIR)/%.f
 clean:
 	@$(RM) -rv $(BDIR)/$(EXE) $(ODIR)/*.o $(DDIR)/*.d 
 
-clean_all: clean
+clean_mesh:
+	@$(RM) -rv $(BDIR)/$(EXE) $(ODIR)/*.o $(DDIR)/*.d 
+
+clean_all: clean clean_mesh
 	@$(RM) -rv $(BDIR) $(ODIR) $(DDIR)
 
 clean_data:
-	@$(RM) -rv data/*
+	@$(RM) -rv mesh/basis/* mesh/mesh/* mesh/shape.vtk
 
 .PHONY: valgrind 
 

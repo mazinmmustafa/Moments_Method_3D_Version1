@@ -1,6 +1,8 @@
 //
 #include "engine_2d.hpp"
 
+const size_t line_max=100;
+
 void R_mn_2d(const real_t alpha_m, const real_t beta_m, const real_t alpha_n, const real_t beta_n, 
     const basis_2d_t &basis_m, const basis_2d_t &basis_n, 
     real_t &R_mn_mm, real_t &R_mn_mp, real_t &R_mn_pm, real_t &R_mn_pp){
@@ -411,58 +413,19 @@ complex_t V_m_plane_wave_2d(const basis_2d_t basis_m, const complex_t E_TM, cons
 
 //
 
-engine_2d_t::engine_2d_t(){
-
-}
-
-engine_2d_t::~engine_2d_t(){
-
-}
-
-const size_t line_max=100;
-
-void engine_2d_t::compute_Z_mn(){
-    shape_info_t shape_info=this->shape.get_shape_info();
-    assert_error(shape_info.is_basis_2d_list_allocated, "no 2d elements were found");
-    size_t N=shape_info.N_2d_basis;
-    complex_t k, eta;
-    k = shape_info.k;
-    eta = shape_info.eta;
-    this->N = N;
-    this->Z_mn.set(N, N);
-    basis_2d_t basis_m, basis_n;
-    char *msg=(char*)calloc(line_max, sizeof(char));
-    print("total number of basis functions: %zu\n", N);
-    size_t count=0;
-    for (size_t m=0; m<N; m++){
-        basis_m = this->shape.get_basis_2d(m);
-        for (size_t n=m; n<N; n++){
-            basis_n = this->shape.get_basis_2d(n);
-            sprintf(msg, "Z_mn (%zu, %zu)", m, n);
-            progress_bar(count, N*(N+1)/2, msg);
-            this->Z_mn(m, n) = Z_mn_2d(basis_m, basis_n, k, eta, this->quadl);
-            count++;
-        }
-        for (size_t n=m+1; n<N; n++){
-            basis_n = this->shape.get_basis_2d(n);
-            this->Z_mn(n, m) = this->Z_mn(m, n);
-        }
-    }
-    free(msg);
-}
-
 void engine_2d_t::save_Z_mn(const char *filename){
     binary_file_t file;
     assert(filename!=null);
     file.open(filename, 'w');
-    print(this->N);
     file.write(&this->N);
+    if (true){print("saving Z_mn solutions...");}
     for (size_t m=0; m<this->N; m++){
         for (size_t n=0; n<this->N; n++){
             file.write(&this->Z_mn(m, n));
         }
     }
     file.close();
+    if (true){print(", done\n");}
 }
 
 void engine_2d_t::load_Z_mn(const char *filename){
@@ -472,30 +435,15 @@ void engine_2d_t::load_Z_mn(const char *filename){
     file.read(&this->N);
     this->Z_mn.unset();
     this->Z_mn.set(this->N, this->N);
+    if (true){print("loading Z_mn solutions...");}
     for (size_t m=0; m<this->N; m++){
         for (size_t n=0; n<this->N; n++){
             file.read(&this->Z_mn(m, n));
         }
     }
     file.close();
-}
-
-void engine_2d_t::compute_V_m_plane_wave(const complex_t E_TM, const complex_t E_TE,
-    const real_t theta_i, const real_t phi_i){
-    shape_info_t shape_info=this->shape.get_shape_info();
-    assert_error(shape_info.is_basis_2d_list_allocated, "no 2d elements were found");
-    size_t N=shape_info.N_2d_basis;
-    complex_t k;
-    k = shape_info.k;
-    this->N = N;
-    this->V_m.set(N, 1);
-    basis_2d_t basis_m;
-    size_t count=0;
-    for (size_t m=0; m<N; m++){
-        basis_m = this->shape.get_basis_2d(m);
-        this->V_m(m, 0) = V_m_plane_wave_2d(basis_m, E_TM, E_TE, k, theta_i, phi_i, this->quadl);
-        count++;
-    }
+    if (true){print(", done\n");}
+    this->is_Z_mn_available = true;
 }
 
 //
@@ -544,11 +492,117 @@ complex_t integrand_RCS_phi_2d(const complex_t alpha_n, const complex_t beta_n, 
     return xi_m+xi_p;
 }
 
+// engine
+
+void  engine_2d_t::set_medium(const complex_t mu, const complex_t eps, const real_t freq){
+    this->shape.set_medium(mu, eps, freq);
+}
+
+void engine_2d_t::mesh(const char *filename, const real_t clmax){
+    assert_error(this->is_mesh_obtained==false, "mesh already exists");
+    this->shape.mesh_2d(filename, clmax);
+    this->shape.get_mesh();
+    this->shape.get_basis_functions();
+    this->shape.load_basis_functions();
+    //
+    shape_info_t shape_info=this->shape.get_shape_info();
+    assert_error(shape_info.is_basis_2d_list_allocated, "no 2d elements were found");
+    this->N = shape_info.N_2d_basis;
+    this->k = shape_info.k;
+    this->eta = shape_info.eta;
+    this->freq = shape_info.freq;
+    this->lambda = shape_info.lambda;
+    this->Z_mn.set(N, N);
+    this->V_m.set(N, 1);
+    this->I_n.set(N, 1);
+    this->is_mesh_obtained = true;
+}
+
+void engine_2d_t::solve_currents(){
+    this->load_Z_mn("data/Z_mn.bin");
+    assert_error(this->is_V_m_available, "no V_m solutions found");
+    if (true){print("solving for I_n...");}
+    this->quadl.set_2d(k_max, tol);
+    this->Z_mn.lup();
+    this->I_n.set(this->N, 1);
+    this->Z_mn.solve(this->V_m, this->I_n);
+    this->quadl.unset_2d();
+    this->is_I_n_available = true;
+    if (true){print(", done\n");}
+}
+
+void engine_2d_t::compute_Z_mn(){
+    this->shape.check();
+    this->quadl.set_2d(k_max, tol);
+    basis_2d_t basis_m, basis_n;
+    char *msg=(char*)calloc(line_max, sizeof(char));
+    print("total number of basis functions: %zu\n", N);
+    size_t count=0;
+    timer_lib_t timer;
+    timer.set();
+    for (size_t m=0; m<1; m++){
+        basis_m = this->shape.get_basis_2d(m);
+        for (size_t n=m; n<N; n++){
+            basis_n = this->shape.get_basis_2d(n);
+            this->Z_mn(m, n) = Z_mn_2d(basis_m, basis_n, k, eta, this->quadl);
+            count++;
+        }
+        for (size_t n=m+1; n<N; n++){
+            basis_n = this->shape.get_basis_2d(n);
+            this->Z_mn(n, m) = this->Z_mn(m, n);
+        }
+    }
+    timer.unset_silent();
+    real_t dt=timer.get_elapsed();
+    dt = dt/N;
+    dt = dt*N*(N-1.0)/2.0;
+    if (dt<3600.0){
+        print("estimate time: %1.0f mintues\n", dt/60.0);
+    }else{
+        print("estimate time: %1.0f hours\n", dt/3600.0);
+    }
+    for (size_t m=1; m<N; m++){
+        basis_m = this->shape.get_basis_2d(m);
+        for (size_t n=m; n<N; n++){
+            basis_n = this->shape.get_basis_2d(n);
+            sprintf(msg, "Z_mn (%zu, %zu)", m, n);
+            progress_bar(count, N*(N+1)/2, msg);
+            this->Z_mn(m, n) = Z_mn_2d(basis_m, basis_n, k, eta, this->quadl);
+            count++;
+        }
+        for (size_t n=m+1; n<N; n++){
+            basis_n = this->shape.get_basis_2d(n);
+            this->Z_mn(n, m) = this->Z_mn(m, n);
+        }
+    }
+    free(msg);
+    this->quadl.unset_2d();
+    engine_2d_t::save_Z_mn("data/Z_mn.bin");
+    this->is_Z_mn_available = true;
+}
+
+void engine_2d_t::compute_V_m_plane_wave(const complex_t E_TM, const complex_t E_TE,
+    const real_t theta_i, const real_t phi_i){
+    this->shape.check();
+    this->quadl.set_2d(k_max, tol);
+    basis_2d_t basis_m;
+    size_t count=0;
+    for (size_t m=0; m<N; m++){
+        basis_m = this->shape.get_basis_2d(m);
+        this->V_m(m, 0) = V_m_plane_wave_2d(basis_m, E_TM, E_TE, k, theta_i, phi_i, this->quadl);
+        count++;
+    }
+    this->quadl.unset_2d();
+    this->is_V_m_available = true;
+}
+
 RCS_2d engine_2d_t::RCS_plane_wave_2d(const real_t theta_s, const real_t phi_s){
+    this->shape.check();
+    this->quadl.set_2d(k_max, tol);
+    assert_error(is_I_n_available, "no I_n solutions found");
     int flag=false;
     integrand_2d_args args;
-    args.k = this->shape.k;
-    const complex_t eta=this->shape.eta;
+    args.k = k;
     args.theta_s = theta_s;
     args.phi_s = phi_s;
     RCS_2d RCS;
@@ -564,5 +618,27 @@ RCS_2d engine_2d_t::RCS_plane_wave_2d(const real_t theta_s, const real_t phi_s){
     }
     RCS.sigma_theta = pi*pow(abs(eta*sigma_theta), 2.0);
     RCS.sigma_phi = pi*pow(abs(eta*sigma_phi), 2.0);
+    this->quadl.unset_2d();
     return RCS;
+}
+
+void engine_2d_t::reset(){
+    this->N = 0;
+    this->k = 0.0;
+    this->eta = 0.0;
+    this->Z_mn.unset();
+    this->V_m.unset();
+    this->I_n.unset();
+    this->is_mesh_obtained = false;    
+    this->is_Z_mn_available = false;
+    this->is_V_m_available = false;
+    this->is_I_n_available = false;
+}
+
+engine_2d_t::engine_2d_t(){
+
+}
+
+engine_2d_t::~engine_2d_t(){
+    engine_2d_t::reset();
 }

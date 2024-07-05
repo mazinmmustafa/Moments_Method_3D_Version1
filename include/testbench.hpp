@@ -11,7 +11,6 @@
 //
 #include "shape.hpp"
 #include "projection.hpp"
-#include "engine.hpp"
 #include "engine_2d.hpp"
 
 // Definitions

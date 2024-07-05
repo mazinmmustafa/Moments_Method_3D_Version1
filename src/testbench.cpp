@@ -297,7 +297,7 @@ void test_engine_2d(){
     vector_t<real_t> v1_m, v2_m, v3_m, v4_m;
     vector_t<real_t> v1_n, v2_n, v3_n, v4_n;
 
-    // Scenario I
+    //// 
 
     v1_m.x = +0.3/10.0; 
     v1_m.y = -0.4/10.0; 
@@ -333,95 +333,6 @@ void test_engine_2d(){
     v4_n.z = +0.0;
 
     basis_2d_t basis_m(v1_m, v2_m, v3_m, v4_m), basis_n(v1_m, v2_m, v3_m, v4_m);
-
-    // Scenario II Case I
-
-    // v1_m.x = +0.0; 
-    // v1_m.y = -0.1; 
-    // v1_m.z = +0.0;
-
-    // v2_m.x = +0.0; 
-    // v2_m.y = +0.2; 
-    // v2_m.z = +0.0;
-
-    // v3_m.x = +0.3; 
-    // v3_m.y = +0.0; 
-    // v3_m.z = +0.0;
-
-    // v4_m.x = -0.2; 
-    // v4_m.y = +0.0; 
-    // v4_m.z = +0.0;
-
-    
-    // v1_n.x = +0.2; 
-    // v1_n.y = +0.3; 
-    // v1_n.z = +0.0;
-
-    // v2_n.x = -0.2; 
-    // v2_n.y = +0.0; 
-    // v2_n.z = +0.0;
-
-    // v3_n.x = +0.0; 
-    // v3_n.y = +0.2; 
-    // v3_n.z = +0.0;
-
-    // v4_n.x = +0.3; 
-    // v4_n.y = +0.0; 
-    // v4_n.z = +0.0;
-
-    // Scenario II Case II
-
-    // v1_m.x = +0.0; 
-    // v1_m.y = -0.1; 
-    // v1_m.z = +0.0;
-
-    // v2_m.x = +0.0; 
-    // v2_m.y = +0.2; 
-    // v2_m.z = +0.0;
-
-    // v3_m.x = +0.3; 
-    // v3_m.y = +0.0; 
-    // v3_m.z = +0.0;
-
-    // v4_m.x = -0.2; 
-    // v4_m.y = +0.0; 
-    // v4_m.z = +0.0;
-
-    
-    // v1_n.x = -0.1; 
-    // v1_n.y = +0.2; 
-    // v1_n.z = +0.0;
-
-    // v2_n.x = +0.3; 
-    // v2_n.y = +0.0; 
-    // v2_n.z = +0.0;
-
-    // v3_n.x = -0.2; 
-    // v3_n.y = +0.0; 
-    // v3_n.z = +0.0;
-
-    // v4_n.x = +0.0; 
-    // v4_n.y = +0.2; 
-    // v4_n.z = +0.0;
-
-
-    // v1_m.x = +4.58016833999998E-02; 
-    // v1_m.y = +8.06880706999997E-02; 
-    // v1_m.z = -4.06501183599998E-01;
-
-    // v2_m.x = +2.52743795999999E-02; 
-    // v2_m.y = -7.89161683999997E-02; 
-    // v2_m.z = -4.08638000399998E-01;
-
-    // v3_m.x = +0.00000000000000E+00; 
-    // v3_m.y = +0.00000000000000E+00; 
-    // v3_m.z = -4.16955118999998E-01;
-
-    // v4_m.x = -8.29421324999997E-02; 
-    // v4_m.y = +6.85692369999997E-03; 
-    // v4_m.z = -4.08564751899998E-01;
-    
-    
     // basis_2d_t basis_m(v1_m, v2_m, v3_m, v4_m), basis_n(v1_m, v2_m, v3_m, v4_m);
 
     timer.set();
@@ -432,61 +343,46 @@ void test_engine_2d(){
 
 }
 
-
 void test_Z_mn_2d(){
 
     timer_lib_t timer;
 
+    // medium parameters
     const real_t GHz=1.0E+9;
-    real_t freq=0.25*GHz;
+    real_t freq=0.75*GHz;
     real_t mu=1.0, eps=1.0;
-    real_t lambda=c_0/freq;
 
     engine_2d_t engine;  
-    engine.shape.set_medium(mu, eps, freq);
+    engine.set_medium(mu, eps, freq);
 
-    const real_t clmax=0.1*lambda;
-    engine.shape.mesh_2d("FreeCAD/test_sphere.geo", clmax);
-
-    engine.shape.get_mesh();
-    engine.shape.get_basis_functions();
-    engine.shape.load_basis_functions();
+    shape_info_t shape_info=engine.get_shape_info();
+    real_t lambda=shape_info.lambda; 
+    const real_t clmax=0.4*lambda;
+    engine.mesh("FreeCAD/test_sphere.geo", clmax);
     
-    const size_t k_max=25;
-    const real_t tol=1.0E-3;
-    engine.quadl.set_2d(k_max, tol);
-
-    // find Z_mn
-    // timer.set();
-    // engine.compute_Z_mn();
-    // timer.unset();
-    // engine.save_Z_mn("data/Z_mn.bin");
-
+    //// find Z_mn
+    timer.set();
+    engine.compute_Z_mn();
+    timer.unset();
+    
     real_t theta_i, phi_i;
     complex_t E_TM, E_TE;
 
     RCS_2d RCS;
     file_t file;
     real_t phi_s;
-    real_t theta_s_min;
-    real_t theta_s_max;
+    real_t theta_s_min, theta_s_max;
     range_t theta_s;
-    const size_t Ns=401;
+    const size_t Ns=1001;
 
-    // RCS theta-theta
+    //// RCS theta-theta
     theta_i = deg2rad(0.0);
     phi_i = deg2rad(0.0);
     E_TM = 1.0;
     E_TE = 0.0;
 
     engine.compute_V_m_plane_wave(E_TM, E_TE, theta_i, phi_i);
-
-    print("solving for I_n...");
-    engine.load_Z_mn("data/Z_mn.bin");
-    engine.Z_mn.lup();
-    engine.I_n.set(engine.N, 1);
-    engine.Z_mn.solve(engine.V_m, engine.I_n);
-    print(", done!\n");
+    engine.solve_currents();
 
     phi_s = deg2rad(0.0);
     theta_s_min = deg2rad(-180.0);
@@ -498,25 +394,19 @@ void test_Z_mn_2d(){
     for (size_t i=0; i<Ns; i++){
         progress_bar(i, Ns, "computing RCS...");
         RCS = engine.RCS_plane_wave_2d(theta_s(i), phi_s);
-        file.write("%21.14E %21.14E %21.14E\n", theta_s(i), RCS.sigma_theta, 
-            RCS.sigma_phi);
+        file.write("%21.14E %21.14E %21.14E\n", theta_s(i), 
+            RCS.sigma_theta/pow(lambda, 2.0), RCS.sigma_phi/pow(lambda, 2.0));
     }
     file.close();
 
-    // RCS phi-phi
+    //// RCS phi-phi
     theta_i = deg2rad(0.0);
     phi_i = deg2rad(0.0);
     E_TM = 0.0;
     E_TE = 1.0;
 
     engine.compute_V_m_plane_wave(E_TM, E_TE, theta_i, phi_i);
-
-    print("solving for I_n...");
-    engine.load_Z_mn("data/Z_mn.bin");
-    engine.Z_mn.lup();
-    engine.I_n.set(engine.N, 1);
-    engine.Z_mn.solve(engine.V_m, engine.I_n);
-    print(", done!\n");
+    engine.solve_currents();
 
     phi_s = deg2rad(0.0);
     theta_s_min = deg2rad(-180.0);
@@ -528,13 +418,10 @@ void test_Z_mn_2d(){
     for (size_t i=0; i<Ns; i++){
         progress_bar(i, Ns, "computing RCS...");
         RCS = engine.RCS_plane_wave_2d(theta_s(i), phi_s);
-        file.write("%21.14E %21.14E %21.14E\n", theta_s(i), RCS.sigma_theta, 
-            RCS.sigma_phi);
+        file.write("%21.14E %21.14E %21.14E\n", theta_s(i), 
+            RCS.sigma_theta/pow(lambda, 2.0), RCS.sigma_phi/pow(lambda, 2.0));
     }
     file.close();
-
-
-    engine.quadl.unset_2d();
 
 }
 

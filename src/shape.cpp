@@ -117,7 +117,6 @@ void shape_t::log_mesh(){
 }
 
 void shape_t::load_mesh(){
-    shape_t::unset();
     file_t file;
     //
     file.open("mesh/mesh/mesh_data.txt", 'r');
@@ -427,36 +426,49 @@ void shape_t::get_basis_functions(){
 }
 
 void shape_t::free_basic_elements(){
-    free(this->edge_data); 
-    this->is_edge_allocated = false;
-    free(this->triangle_data); 
-    this->is_triangle_allocated = false;
-    free(this->tetrahedron_data); 
-    this->is_tetrahedron_allocated = false;
+    if (this->is_edge_allocated){
+        free(this->edge_data); 
+        this->is_edge_allocated = false;
+    }
+    if (this->is_triangle_allocated){
+        free(this->triangle_data); 
+        this->is_triangle_allocated = false;
+    }
+    if (this->is_tetrahedron_allocated){
+        free(this->tetrahedron_data); 
+        this->is_tetrahedron_allocated = false;
+    }
 }
 
 void shape_t::load_basis_functions(){   
+    assert_error(this->is_medium_set, "medium parameters not set yet");
     file_t file;
     file.open("mesh/basis/basis_info.txt", 'r');
     file.read("%zu", &this->N_1d_basis);
     file.read("%zu", &this->N_2d_basis);
     file.read("%zu", &this->N_3d_basis);
     file.close();
-    this->basis_1d_list = (basis_1d_t*)calloc(this->N_1d_basis, sizeof(basis_1d_t));
-    this->basis_2d_list = (basis_2d_t*)calloc(this->N_2d_basis, sizeof(basis_2d_t));
-    this->basis_3d_list = (basis_3d_t*)calloc(this->N_3d_basis, sizeof(basis_3d_t));
-    assert(this->basis_1d_list!=null);
-    assert(this->basis_2d_list!=null);
-    assert(this->basis_3d_list!=null);
-    this->is_basis_1d_list_allocated = true;
-    this->is_basis_2d_list_allocated = true;
-    this->is_basis_3d_list_allocated = true;
+    if (this->N_1d_basis>0&&this->is_basis_1d_list_allocated==false){
+        this->basis_1d_list = (basis_1d_t*)calloc(this->N_1d_basis, sizeof(basis_1d_t));
+        assert(this->basis_1d_list!=null);
+        this->is_basis_1d_list_allocated = true;
+    }
+    if (this->N_2d_basis>0&&this->is_basis_2d_list_allocated==false){
+        this->basis_2d_list = (basis_2d_t*)calloc(this->N_2d_basis, sizeof(basis_2d_t));
+        assert(this->basis_2d_list!=null);
+        this->is_basis_2d_list_allocated = true;
+    }
+    if (this->N_3d_basis>0&&this->is_basis_3d_list_allocated==false){
+        this->basis_3d_list = (basis_3d_t*)calloc(this->N_3d_basis, sizeof(basis_3d_t));
+        assert(this->basis_3d_list!=null);
+        this->is_basis_3d_list_allocated = true;
+    }
+    basis_1d_t basis_1d;
     basis_2d_t basis_2d;
     basis_3d_t basis_3d;
     //
     file.open("mesh/basis/basis_1d.txt", 'r');
     for (size_t i=0; i<this->N_1d_basis; i++){
-        basis_1d_t basis_1d;
         file.read("%lf", &basis_1d.r_m.x);
         file.read("%lf", &basis_1d.r_m.y);
         file.read("%lf", &basis_1d.r_m.z);
@@ -490,12 +502,6 @@ void shape_t::load_basis_functions(){
         file.read("%lf", &basis_2d.r_p.z);
         file.read("%d", &basis_2d.physical_group_m);
         file.read("%d", &basis_2d.physical_group_p);
-        
-        basis_2d.r_m=basis_2d.r_m*this->lambda;
-        basis_2d.r_p=basis_2d.r_p*this->lambda;
-        basis_2d.e_1=basis_2d.e_1*this->lambda;
-        basis_2d.e_2=basis_2d.e_2*this->lambda;
-
         basis_2d.get_values();
         this->basis_2d_list[i] = basis_2d;
     }
@@ -530,7 +536,7 @@ void shape_t::load_basis_functions(){
 shape_info_t shape_t::get_shape_info(){
     shape_info_t shape_info={this->N_1d_basis, this->N_2d_basis, this->N_3d_basis, 
         this->is_basis_1d_list_allocated, this->is_basis_2d_list_allocated, this->is_basis_3d_list_allocated,
-        this->k, this->eta};
+        this->k, this->eta, this->freq, this->lambda};
     return shape_info;
 }
 
@@ -541,5 +547,43 @@ void shape_t::set_medium(const complex_t mu, const complex_t eps, const real_t f
     this->eta = sqrt(mu_0/eps_0)*sqrt(mu/eps);
     assert_error(freq>0.0, "invalid frequency");
     this->freq = freq;
-    this->lambda = (c_0/freq)/real(sqrt(eps*mu));
+    this->lambda = 2.0*pi/real(this->k);
+    this->is_medium_set = true;
+}
+
+void shape_t::mesh_1d(const char *gmsh_filename, const real_t clmax){
+    int_t return_value;
+    char *cmd=(char*)calloc(200, sizeof(char));
+    sprintf(cmd, "gmsh mesh/%s -1 -clmax %0.4f -format vtk -save_all -o mesh/shape.vtk", 
+        gmsh_filename, clmax);
+    return_value = system(cmd);
+    free(cmd);
+    assert_error(return_value==0, "failed to call gmsh");
+}
+
+void shape_t::mesh_2d(const char *gmsh_filename, const real_t clmax){
+    int_t return_value;
+    char *cmd=(char*)calloc(200, sizeof(char));
+    sprintf(cmd, "gmsh mesh/%s -2 -clmax %0.4f -format vtk -save_all -o mesh/shape.vtk", 
+        gmsh_filename, clmax);
+    return_value = system(cmd);
+    free(cmd);
+    assert_error(return_value==0, "failed to call gmsh");
+}
+
+void shape_t::mesh_3d(const char *gmsh_filename, const real_t clmax){
+    int_t return_value;
+    char *cmd=(char*)calloc(200, sizeof(char));
+    sprintf(cmd, "gmsh mesh/%s -3 -clmax %0.4f -format vtk -save_all -o mesh/shape.vtk", 
+        gmsh_filename, clmax);
+    return_value = system(cmd);
+    free(cmd);
+    assert_error(return_value==0, "failed to call gmsh");
+}
+
+void shape_t::check(){
+    // assert_error(this->is_basis_1d_list_allocated, "no 1d basis functions found");
+    assert_error(this->is_basis_2d_list_allocated, "no 2d basis functions found");
+    // assert_error(this->is_basis_3d_list_allocated, "no 3d basis functions found");
+    assert_error(this->is_medium_set, "medium paramters not set yet");
 }
