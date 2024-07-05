@@ -32,7 +32,7 @@ SDIR = src
 ODIR = .obj
 DDIR = .dep
 HDIR = include
-PDIR = data
+PDIR = data mesh/mesh mesh/basis
 
 # Variables
 CXXSRC = $(wildcard $(SDIR)/*.cpp)
