@@ -357,7 +357,7 @@ void test_Z_mn_2d(){
 
     shape_info_t shape_info=engine.get_shape_info();
     real_t lambda=shape_info.lambda; 
-    const real_t clmax=0.4*lambda;
+    const real_t clmax=0.2*lambda;
     engine.mesh("FreeCAD/test_sphere.geo", clmax);
     
     //// find Z_mn
@@ -390,12 +390,13 @@ void test_Z_mn_2d(){
     theta_s.set(theta_s_min, theta_s_max, Ns);
     theta_s.linspace();
     
-    file.open("data/RCS1.txt", 'w');
+    file.open("figures/RCS1/figure1.txt", 'w');
     for (size_t i=0; i<Ns; i++){
         progress_bar(i, Ns, "computing RCS...");
         RCS = engine.RCS_plane_wave_2d(theta_s(i), phi_s);
-        file.write("%21.14E %21.14E %21.14E\n", theta_s(i), 
-            RCS.sigma_theta/pow(lambda, 2.0), RCS.sigma_phi/pow(lambda, 2.0));
+        file.write("%21.14E %21.14E %21.14E\n", rad2deg(theta_s(i)), 
+            10.0*log10(RCS.sigma_theta/pow(lambda, 2.0)), 
+            10.0*log10(RCS.sigma_phi/pow(lambda, 2.0)));
     }
     file.close();
 
@@ -414,12 +415,13 @@ void test_Z_mn_2d(){
     theta_s.set(theta_s_min, theta_s_max, Ns);
     theta_s.linspace();
     
-    file.open("data/RCS2.txt", 'w');
+    file.open("figures/RCS1/figure2.txt", 'w');
     for (size_t i=0; i<Ns; i++){
         progress_bar(i, Ns, "computing RCS...");
         RCS = engine.RCS_plane_wave_2d(theta_s(i), phi_s);
-        file.write("%21.14E %21.14E %21.14E\n", theta_s(i), 
-            RCS.sigma_theta/pow(lambda, 2.0), RCS.sigma_phi/pow(lambda, 2.0));
+        file.write("%21.14E %21.14E %21.14E\n", rad2deg(theta_s(i)), 
+            10.0*log10(RCS.sigma_theta/pow(lambda, 2.0)), 
+            10.0*log10(RCS.sigma_phi/pow(lambda, 2.0)));
     }
     file.close();
 

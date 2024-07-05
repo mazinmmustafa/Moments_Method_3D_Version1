@@ -32,7 +32,6 @@ SDIR = src
 ODIR = .obj
 DDIR = .dep
 HDIR = include
-PDIR = data mesh
 
 # Variables
 CXXSRC = $(wildcard $(SDIR)/*.cpp)
@@ -50,9 +49,9 @@ CDEP = $(patsubst $(ODIR)/%.o, $(DDIR)/%.d, $(COBJ))
 CXXDEPFLG = -MMD -MF $(patsubst $(ODIR)/%.o, $(DDIR)/%.d, $@) 
 
 # Targets
-.PHONY: build run clean clean_mesh clean_all
+.PHONY: build run clean clean_mesh clean_all figures
 
-build: $(BDIR) $(ODIR) $(DDIR) $(PDIR) $(BDIR)/$(EXE) 
+build: $(BDIR) $(ODIR) $(DDIR) $(BDIR)/$(EXE) 
 
 run: build
 	@echo executing $^:
@@ -65,9 +64,6 @@ $(ODIR):
 	@mkdir -pv $@
 
 $(DDIR): 
-	@mkdir -pv $@
-
-$(PDIR): 
 	@mkdir -pv $@
 
 $(BDIR)/$(EXE): $(CXXOBJ) $(COBJ) $(F90OBJ) $(F77OBJ)
@@ -95,7 +91,12 @@ clean_all: clean clean_mesh
 	@$(RM) -rv $(BDIR) $(ODIR) $(DDIR)
 
 clean_data:
-	@$(RM) -rv data/*
+	@find ./data/ -type f -name '*.txt' | xargs $(RM) -rv
+	@find ./figures/ -type f -name '*.pdf' | xargs $(RM) -rv
+	@find ./figures/ -type f -name '*.txt' | xargs $(RM) -rv
+	@find ./figures/ -type f -name '*.log' | xargs $(RM) -rv
+	@find ./figures/ -type f -name '*.aux' | xargs $(RM) -rv
+	@find ./figures/ -type f -name '*.tex' | xargs $(RM) -rv
 
 .PHONY: valgrind 
 
@@ -114,6 +115,9 @@ git_pull: clean_all
 
 gmsh:
 	@python3 mesh/generate_mesh.py
+
+figures:
+	$(MAKE) -C figures/RCS1/
 
 # Includes
 -include $(CXXDEP) $(CDEP)
