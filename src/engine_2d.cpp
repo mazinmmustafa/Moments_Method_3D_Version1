@@ -557,9 +557,9 @@ void engine_2d_t::compute_Z_mn(){
     dt = dt/N;
     dt = dt*N*(N-1.0)/2.0;
     if (dt<3600.0){
-        print("estimated time: %1.0f mintues\n", dt/60.0);
+        print("estimated time: %3.1f mintues\n", dt/60.0);
     }else{
-        print("estimated time: %1.0f hours\n", dt/3600.0);
+        print("estimated time: %3.1f hours\n", dt/3600.0);
     }
     for (size_t m=1; m<N; m++){
         basis_m = this->shape.get_basis_2d(m);
