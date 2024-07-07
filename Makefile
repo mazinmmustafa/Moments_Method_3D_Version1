@@ -95,6 +95,7 @@ clean_all: clean clean_mesh
 	@$(RM) -rv $(BDIR) $(ODIR) $(DDIR)
 
 clean_data:
+	@find ./data/ -type f -name '*.pos' | xargs $(RM) -rv
 	@find ./data/ -type f -name '*.bin' | xargs $(RM) -rv
 	@find ./data/ -type f -name '*.txt' | xargs $(RM) -rv
 	@find ./figures/ -type f -name '*.pdf' | xargs $(RM) -rv
