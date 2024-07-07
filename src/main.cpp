@@ -15,9 +15,9 @@ int main(){
     // test_RCS_sphere_2d();
     // test_RCS_shape_2d();
     // test_near_field_2d();
-    test_near_field_heat_map_2d();
+    // test_near_field_heat_map_2d();
+    test_current_2d();
 
     return 0;
-
 }
 

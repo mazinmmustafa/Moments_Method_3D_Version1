@@ -742,3 +742,42 @@ void test_near_field_heat_map_2d(){
     x.unset();
     z.unset();
 }
+
+void test_current_2d(){
+
+    timer_lib_t timer;
+
+    // medium parameters
+    const real_t GHz=1.0E+9;
+    real_t freq=0.25*GHz;
+    real_t mu=1.0, eps=1.0;
+
+    engine_2d_t engine;  
+    engine.set_medium(mu, eps, freq);
+
+    shape_info_t shape_info=engine.get_shape_info();
+    real_t lambda=shape_info.lambda; 
+    const real_t clmax=0.2*lambda;
+    engine.mesh("FreeCAD/test_sphere.geo", clmax);
+    
+    //// find Z_mn
+    // timer.set();
+    // engine.compute_Z_mn();
+    // timer.unset();
+    
+    real_t theta_i, phi_i;
+    complex_t E_TM, E_TE;
+
+    //// 
+    theta_i = deg2rad(90.0);
+    phi_i = deg2rad(180.0);
+    E_TM = 1.0;
+    E_TE = 0.0;
+
+    engine.compute_V_m_plane_wave(E_TM, E_TE, theta_i, phi_i);
+    engine.solve_currents();
+    engine.export_currents();
+
+
+
+}

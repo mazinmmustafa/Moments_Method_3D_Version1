@@ -28,5 +28,6 @@ void test_RCS_sphere_2d();
 void test_RCS_shape_2d();
 void test_near_field_2d();
 void test_near_field_heat_map_2d();
+void test_current_2d();
 
 #endif

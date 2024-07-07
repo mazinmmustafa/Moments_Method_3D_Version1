@@ -60,6 +60,7 @@ int is_equal(const vector_t<real_t> A, const vector_t<real_t> B, const real_t to
 vector_t<real_t> real_v(const vector_t<complex_t> A);
 vector_t<real_t> imag_v(const vector_t<complex_t> A);
 
-
+vector_t<complex_t> operator * (const vector_t<real_t> A, const complex_t a);
+vector_t<complex_t> operator * (const complex_t a, const vector_t<real_t> A);
 
 #endif
