@@ -641,7 +641,6 @@ void engine_2d_t::compute_Z_mn(){
     this->quadl.set_2d(k_max, tol);
     basis_2d_t basis_m, basis_n;
     char *msg=(char*)calloc(line_max, sizeof(char));
-    print("total number of basis functions: %zu\n", N);
     size_t count=0;
     timer_lib_t timer;
     timer.set();
@@ -786,7 +785,7 @@ int is_inside_list(int *list, int index, const size_t N){
 }
 
 void engine_2d_t::export_currents(){
-    file_t file;
+    file_t file1, file2, file3;
     basis_2d_t basis_n;
     real_t alpha, beta;
     alpha = beta = 1.0/3.0;
@@ -796,25 +795,27 @@ void engine_2d_t::export_currents(){
     //
     size_t N_triangles;
     size_t dummy_size_t;
-    file.open("mesh/mesh/mesh_data.txt", 'r');
-    file.read("%zu", &N_triangles);
-    file.read("%zu", &N_triangles);
-    file.read("%zu", &N_triangles);
-    file.read("%zu", &dummy_size_t);
+    file1.open("mesh/mesh/mesh_data.txt", 'r');
+    file1.read("%zu", &N_triangles);
+    file1.read("%zu", &N_triangles);
+    file1.read("%zu", &N_triangles);
+    file1.read("%zu", &dummy_size_t);
+    file1.close();
     triangles_list = (triangle_t*)calloc(N_triangles, sizeof(triangles_list));
     assert(triangles_list!=null);
-    file.open("mesh/mesh/mesh_2d.txt", 'r');
-    int dummy;
+    file2.open("mesh/mesh/mesh_2d.txt", 'r');
+    int dummy1, dummy2, dummy3;
     for (size_t i=0; i<N_triangles; i++){
-        file.read("%lf %lf %lf %d\n", &triangles_list[i].v[0].x, &triangles_list[i].v[0].y, &triangles_list[i].v[0].z, &dummy);
-        file.read("%lf %lf %lf %d\n", &triangles_list[i].v[1].x, &triangles_list[i].v[1].y, &triangles_list[i].v[1].z, &dummy);
-        file.read("%lf %lf %lf %d\n", &triangles_list[i].v[2].x, &triangles_list[i].v[2].y, &triangles_list[i].v[2].z, &dummy);
-        file.read("\n");
+        file2.read("%lf %lf %lf %d\n", &triangles_list[i].v[0].x, &triangles_list[i].v[0].y, &triangles_list[i].v[0].z, &dummy1);
+        file2.read("%lf %lf %lf %d\n", &triangles_list[i].v[1].x, &triangles_list[i].v[1].y, &triangles_list[i].v[1].z, &dummy2);
+        file2.read("%lf %lf %lf %d\n", &triangles_list[i].v[2].x, &triangles_list[i].v[2].y, &triangles_list[i].v[2].z, &dummy3);
+        file2.read("\n");
     }
+    file2.close();
     //
     print("exporting currents...");
-    file.open("data/current.pos", 'w');
-    file.write("View \"background mesh\" {\n");
+    file3.open("data/current.pos", 'w');
+    file3.write("View \"background mesh\" {\n");
     for (size_t i=0; i<N_triangles; i++){
         triangle = triangles_list[i];
         vector_t<complex_t> J;  
@@ -852,13 +853,13 @@ void engine_2d_t::export_currents(){
                 }
             }
         }
-        file.write("ST(%21.14E, %21.14E, %21.14E, ", triangle.v[0].x, triangle.v[0].y, triangle.v[0].z);
-        file.write("%21.14E, %21.14E, %21.14E, ", triangle.v[1].x, triangle.v[1].y, triangle.v[1].z);
-        file.write("%21.14E, %21.14E, %21.14E){", triangle.v[2].x, triangle.v[2].y, triangle.v[2].z);
-        file.write("%21.14E, %21.14E, %21.14E};\n", mag(J), mag(J), mag(J));
+        file3.write("ST(%21.14E, %21.14E, %21.14E, ", triangle.v[0].x, triangle.v[0].y, triangle.v[0].z);
+        file3.write("%21.14E, %21.14E, %21.14E, ", triangle.v[1].x, triangle.v[1].y, triangle.v[1].z);
+        file3.write("%21.14E, %21.14E, %21.14E){", triangle.v[2].x, triangle.v[2].y, triangle.v[2].z);
+        file3.write("%21.14E, %21.14E, %21.14E};\n", mag(J), mag(J), mag(J));
     }
-    file.write("};\n");
-    file.close();
+    file3.write("};\n");
+    file3.close();
     print(", done!\n");
     free(triangles_list);
 }

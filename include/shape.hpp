@@ -9,6 +9,8 @@
 
 // Definitions
 
+const size_t __max_system__=18000;
+
 const real_t tol_vertex=1.0E-6;
 
 struct edge_t{

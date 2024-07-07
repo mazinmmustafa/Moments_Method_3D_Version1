@@ -19,9 +19,9 @@ quadl_t::quadl_t(){
 }
 
 quadl_t::~quadl_t(){
-    if (this->is_allocated){
-        quadl_t::unset();
-    }
+    // if (this->is_allocated){
+    //     quadl_t::unset();
+    // }
 }
 
 void quadl_t::set(const size_t N, const size_t k_max, const real_t tol){

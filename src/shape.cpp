@@ -6,7 +6,7 @@ shape_t::shape_t(){
 }
 
 shape_t::~shape_t(){
-    shape_t::unset();
+    // shape_t::unset();
 }
 
 void shape_t::unset(){
@@ -418,6 +418,8 @@ void shape_t::get_basis_functions(){
     print(this->N_3d_basis);
     print("total number of basis functions: ");
     print(this->N_1d_basis+this->N_2d_basis+this->N_3d_basis);
+    assert_error((this->N_1d_basis+this->N_2d_basis+this->N_3d_basis)<__max_system__, 
+        "too many basis functions");
     file.open("mesh/basis/basis_info.txt", 'w');
     file.write("%zu\n%zu\n%zu", this->N_1d_basis, this->N_2d_basis, this->N_3d_basis);
     file.close();

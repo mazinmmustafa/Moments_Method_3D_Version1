@@ -6,7 +6,6 @@ file_t::file_t(){
 }
 
 file_t::~file_t(){
-    // file_t::close();
 }
 
 void file_t::open(const char *filename, const char mode){

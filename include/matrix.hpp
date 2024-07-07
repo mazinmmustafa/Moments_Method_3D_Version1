@@ -18,7 +18,7 @@ class matrix_t{
     public:
         matrix_t(){}
         ~matrix_t(){
-             matrix_t::unset();
+            //  matrix_t::unset();
         }
     void set(const size_t rows, const size_t cols){
         if (this->is_allocated){
