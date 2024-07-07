@@ -2,7 +2,7 @@ reset
 set terminal cairolatex standalone color background rgbcolor 'white' \
 size 12 cm, 7.5 cm
 
-set output 'figure2.tex'
+set output 'figure3.tex'
 
 # set palette rgb 7,5,15; set title "traditional pm3d\n(black-blue-red-yellow)"
 # set palette rgb 3,11,6; set title "green-red-violet"
@@ -26,7 +26,7 @@ set size ratio 1
 set xrange [-1:1]
 set yrange [-1:1]
 
-set cbrange [0:+2]
+set cbrange [0:+4]
 
 # set xtics 2
 # set ytics 2
@@ -38,6 +38,6 @@ set tics front
 
 set xlabel '$x$ [m]'
 set ylabel '$z$ [m]'
-set title '$|\mathcal{R}eE|$ [V/m]'
+set title '$|\mathcal{R}eH|$ [mA/m]'
 
-plot 'figure2.txt' with image notitle
+plot 'figure3.txt' with image notitle

@@ -60,6 +60,7 @@ class engine_2d_t{
         }
         field_2d_t compute_incident_plane_wave_field(const real_t theta_i, const real_t phi_i,
             const complex_t E_TM, const complex_t E_TE, const vector_t<real_t> p);
+        void export_currents();
 };
 
 // Functions

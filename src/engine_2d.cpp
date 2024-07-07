@@ -451,6 +451,37 @@ complex_t integrand_E_2d(const complex_t alpha_n, const complex_t beta_n, void *
     return sum;
 }
 
+complex_t integrand_H_2d(const complex_t alpha_n, const complex_t beta_n, void *args_){
+    integrand_2d_args *args=(integrand_2d_args*)args_;
+    vector_t<real_t> p=args->p;
+    vector_t<real_t> direction=args->direction;
+    vector_t<real_t> rho_m, rho_p;
+    basis_2d_t basis_n;
+    engine_2d_t *engine=args->engine;
+    complex_t k=engine->k;
+    complex_t sum=0.0;
+    for (size_t n=0; n<engine->N; n++){
+        basis_n = engine->shape.get_basis_2d(n);
+        rho_m = +1.0*(real(alpha_n)*basis_n.L_m1+real(beta_n)*basis_n.L_m2);
+        rho_p = -1.0*(real(alpha_n)*basis_n.L_p1+real(beta_n)*basis_n.L_p2);
+        real_t R_m, R_p;
+        R_m = mag(p-(basis_n.r_m+rho_m));
+        R_p = mag(p-(basis_n.r_p-rho_p));
+        const complex_t j=complex_t(0.0, 1.0);
+        complex_t g_m=exp(-j*k*R_m)/(4.0*pi*R_m);
+        complex_t g_p=exp(-j*k*R_p)/(4.0*pi*R_p);
+        vector_t<real_t> R_m_u=unit(p-(basis_n.r_m+rho_m));
+        vector_t<real_t> R_p_u=unit(p-(basis_n.r_p-rho_p));
+        complex_t I_B_m, I_B_p;
+        I_B_m = -((1.0+j*k*R_m)/R_m)*(direction*(R_m_u^rho_m))*g_m;
+        I_B_p = -((1.0+j*k*R_p)/R_p)*(direction*(R_p_u^rho_p))*g_p;
+        complex_t B;
+        B = (I_B_m+I_B_p);
+        sum+=basis_n.L*B*engine->I_n(n, 0);
+    }
+    return sum;
+}
+
 field_2d_t engine_2d_t::compute_near_field(const vector_t<real_t> p){
     this->shape.check();
     assert_error(is_I_n_available, "no I_n solutions found");
@@ -469,11 +500,17 @@ field_2d_t engine_2d_t::compute_near_field(const vector_t<real_t> p){
     args.direction = x_u;
     field.E.x = this->quadl.integral_2d(integrand_E_2d, &args, triangle, flag);
     if(flag){flag=false; print("warning: no convergence!\n");}
+    field.H.x = this->quadl.integral_2d(integrand_H_2d, &args, triangle, flag);
+    if(flag){flag=false; print("warning: no convergence!\n");}
     args.direction = y_u;
     field.E.y = this->quadl.integral_2d(integrand_E_2d, &args, triangle, flag);
     if(flag){flag=false; print("warning: no convergence!\n");}
+    field.H.y = this->quadl.integral_2d(integrand_H_2d, &args, triangle, flag);
+    if(flag){flag=false; print("warning: no convergence!\n");}
     args.direction = z_u;
     field.E.z = this->quadl.integral_2d(integrand_E_2d, &args, triangle, flag);
+    if(flag){flag=false; print("warning: no convergence!\n");}
+    field.H.z = this->quadl.integral_2d(integrand_H_2d, &args, triangle, flag);
     if(flag){flag=false; print("warning: no convergence!\n");}
     this->quadl.unset_2d();
     return field;
@@ -738,3 +775,64 @@ field_2d_t engine_2d_t::compute_incident_plane_wave_field(const real_t theta_i, 
     const complex_t E_TM, const complex_t E_TE, const vector_t<real_t> p){
     return incident_plane_wave_field(theta_i, phi_i, this->k, this->eta, E_TM, E_TE, p);
 }
+
+// void engine_2d_t::export_currents(){
+//     file_t file;
+//     file.open("data/currents.pos", 'w');
+
+
+//     triangle_t triangle_s, triangle_d;
+//     size_t new_triangle[2];
+//     size_t index_triangle_s;
+//     size_t index_triangle_d;
+//     for (size_t i=0; i<this->N_triangles; i++){
+//         triangle_s = this->triangle_data[i];
+//         for (size_t j=(i+1); j<this->N_triangles; j++){
+//             triangle_d = this->triangle_data[j];
+//             // 
+//             size_t count=0;
+//             index_triangle_s = 0;
+//             index_triangle_d = 0;
+//             for (size_t ii=0; ii<3; ii++){
+//                 for (size_t jj=0; jj<3; jj++){
+//                     if (is_equal(triangle_s.v[ii], triangle_d.v[jj], tol_vertex)){
+//                         new_triangle[count] = ii;
+//                         index_triangle_s+=ii;
+//                         index_triangle_d+=jj;
+//                         count++;
+//                         if (count==2){
+//                             break;
+//                         }
+//                     }
+//                 }
+//             }
+//             if (count==2){
+//                 index_triangle_s = mod_2d(index_triangle_s);
+//                 index_triangle_d = mod_2d(index_triangle_d);
+//                 file.write("%21.14E %21.14E %21.14E ", 
+//                     triangle_s.v[index_triangle_s].x,
+//                     triangle_s.v[index_triangle_s].y,
+//                     triangle_s.v[index_triangle_s].z);
+//                 file.write("%21.14E %21.14E %21.14E ", 
+//                     triangle_s.v[new_triangle[0]].x,
+//                     triangle_s.v[new_triangle[0]].y,
+//                     triangle_s.v[new_triangle[0]].z);
+//                 file.write("%21.14E %21.14E %21.14E ", 
+//                     triangle_s.v[new_triangle[1]].x,
+//                     triangle_s.v[new_triangle[1]].y,
+//                     triangle_s.v[new_triangle[1]].z);
+//                 file.write("%21.14E %21.14E %21.14E ", 
+//                     triangle_d.v[index_triangle_d].x,
+//                     triangle_d.v[index_triangle_d].y,
+//                     triangle_d.v[index_triangle_d].z);
+//                 file.write("%d %d\n", triangle_s.physical_group, triangle_d.physical_group);
+//                 count = 0;
+//                 triangle_s.N_adjacents++;
+//                 triangle_d.N_adjacents++;
+//                 this->N_2d_basis++;
+//             }
+//         }
+//     }
+
+//     file.close();
+// }

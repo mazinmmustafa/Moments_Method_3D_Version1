@@ -675,7 +675,7 @@ void test_near_field_heat_map_2d(){
 
     // medium parameters
     const real_t GHz=1.0E+9;
-    real_t freq=0.5*GHz;
+    real_t freq=0.25*GHz;
     real_t mu=1.0, eps=1.0;
 
     engine_2d_t engine;  
@@ -695,10 +695,10 @@ void test_near_field_heat_map_2d(){
     complex_t E_TM, E_TE;
 
     field_2d_t field_s, field_i;
-    file_t file;
+    file_t file_E, file_H;
     range_t x, z;
     real_t z_min, z_max, y, x_min, x_max;
-    const size_t Ns=101;
+    const size_t Ns=41;
 
     //// 
     theta_i = deg2rad(90.0);
@@ -719,7 +719,8 @@ void test_near_field_heat_map_2d(){
     x.linspace();
     z.linspace();
     
-    file.open("figures/near_field/figure2.txt", 'w');
+    file_E.open("figures/near_field/figure2.txt", 'w');
+    file_H.open("figures/near_field/figure3.txt", 'w');
     size_t counter=0;
     for (size_t i=0; i<Ns; i++){
         for (size_t j=0; j<Ns; j++){
@@ -727,12 +728,16 @@ void test_near_field_heat_map_2d(){
             vector_t<real_t>p(x(i), y, z(j));
             field_s = engine.compute_near_field(p);
             field_i = engine.compute_incident_plane_wave_field(theta_i, phi_i, E_TM, E_TE, p);
-            file.write("%21.14E %21.14E %21.14E\n", x(i), z(j), 
-                mag(field_s.E+field_i.E));
+            file_E.write("%21.14E %21.14E %21.14E\n", x(i), z(j), 
+                mag(real_v(field_s.E+field_i.E)));
+            file_H.write("%21.14E %21.14E %21.14E\n", x(i), z(j), 
+                mag(real_v(field_s.H+field_i.H))/1.0E-3);
         }
-        file.write("\n");
+        file_E.write("\n");
+        file_H.write("\n");
     }
-    file.close();
+    file_E.close();
+    file_H.close();
 
     x.unset();
     z.unset();
