@@ -1,14 +1,6 @@
 {
     "files.associations": {
-        "*.ipp": "cpp",
-        "*.tcc": "cpp",
-        "random": "cpp",
-        "fstream": "cpp",
-        "cmath": "cpp",
         "complex": "cpp",
-        "array": "cpp",
-        "string": "cpp",
-        "string_view": "cpp",
-        "span": "cpp"
+        "cmath": "cpp"
     }
 }

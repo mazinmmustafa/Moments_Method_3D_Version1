@@ -130,3 +130,5 @@ figures:
 # Includes
 -include $(CXXDEP) $(CDEP)
 
+test:
+	$(MAKE) run && $(MAKE) -C figures/near_field

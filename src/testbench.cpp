@@ -368,7 +368,7 @@ void test_Z_mn_2d(){
     real_t theta_i, phi_i;
     complex_t E_TM, E_TE;
 
-    RCS_2d RCS;
+    RCS_2d_t RCS;
     file_t file;
     real_t phi_s;
     real_t theta_s_min, theta_s_max;
@@ -399,6 +399,7 @@ void test_Z_mn_2d(){
             10.0*log10(RCS.sigma_phi/pow(lambda, 2.0)));
     }
     file.close();
+    theta_s.unset();
 
     //// RCS phi-phi
     theta_i = deg2rad(0.0);
@@ -424,18 +425,19 @@ void test_Z_mn_2d(){
             10.0*log10(RCS.sigma_phi/pow(lambda, 2.0)));
     }
     file.close();
+    theta_s.unset();
 
 }
 
 //
 
-void test_RCS_shpere_2d(){
+void test_RCS_sphere_2d(){
 
     timer_lib_t timer;
 
     // medium parameters
     const real_t GHz=1.0E+9;
-    real_t freq=0.75*GHz;
+    real_t freq=0.5*GHz;
     real_t mu=1.0, eps=1.0;
 
     engine_2d_t engine;  
@@ -454,7 +456,7 @@ void test_RCS_shpere_2d(){
     real_t theta_i, phi_i;
     complex_t E_TM, E_TE;
 
-    RCS_2d RCS;
+    RCS_2d_t RCS;
     file_t file;
     real_t phi_s;
     real_t theta_s_min, theta_s_max;
@@ -485,6 +487,7 @@ void test_RCS_shpere_2d(){
             10.0*log10(RCS.sigma_phi/pow(lambda, 2.0)));
     }
     file.close();
+    theta_s.unset();
 
     //// RCS phi-phi
     theta_i = deg2rad(0.0);
@@ -510,6 +513,7 @@ void test_RCS_shpere_2d(){
             10.0*log10(RCS.sigma_phi/pow(lambda, 2.0)));
     }
     file.close();
+    theta_s.unset();
 
 }
 
@@ -539,7 +543,7 @@ void test_RCS_shape_2d(){
     real_t theta_i, phi_i;
     complex_t E_TM, E_TE;
 
-    RCS_2d RCS;
+    RCS_2d_t RCS;
     file_t file;
     real_t phi_s;
     real_t theta_s_min, theta_s_max;
@@ -570,6 +574,7 @@ void test_RCS_shape_2d(){
             10.0*log10(RCS.sigma_phi/pow(lambda, 2.0)));
     }
     file.close();
+    theta_s.unset();
 
     //// RCS phi-phi
     theta_i = deg2rad(0.0);
@@ -596,6 +601,7 @@ void test_RCS_shape_2d(){
     }
     file.close();
 
+    theta_s.unset();
 }
 
 //
@@ -606,7 +612,7 @@ void test_near_field_2d(){
 
     // medium parameters
     const real_t GHz=1.0E+9;
-    real_t freq=0.75*GHz;
+    real_t freq=0.5*GHz;
     real_t mu=1.0, eps=1.0;
 
     engine_2d_t engine;  
@@ -618,22 +624,21 @@ void test_near_field_2d(){
     engine.mesh("FreeCAD/test_sphere.geo", clmax);
     
     //// find Z_mn
-    timer.set();
-    engine.compute_Z_mn();
-    timer.unset();
+    // timer.set();
+    // engine.compute_Z_mn();
+    // timer.unset();
     
     real_t theta_i, phi_i;
     complex_t E_TM, E_TE;
 
-    RCS_2d RCS;
+    field_2d_t field_s, field_i;
     file_t file;
-    real_t phi_s;
-    real_t theta_s_min, theta_s_max;
-    range_t theta_s;
-    const size_t Ns=1001;
+    range_t z;
+    real_t z_min, z_max, x, y;
+    const size_t Ns=401;
 
-    //// RCS theta-theta
-    theta_i = deg2rad(0.0);
+    //// 
+    theta_i = deg2rad(90.0);
     phi_i = deg2rad(0.0);
     E_TM = 1.0;
     E_TE = 0.0;
@@ -641,45 +646,94 @@ void test_near_field_2d(){
     engine.compute_V_m_plane_wave(E_TM, E_TE, theta_i, phi_i);
     engine.solve_currents();
 
-    phi_s = deg2rad(0.0);
-    theta_s_min = deg2rad(-180.0);
-    theta_s_max = deg2rad(+180.0);
-    theta_s.set(theta_s_min, theta_s_max, Ns);
-    theta_s.linspace();
+    x = 1.0;
+    y = 1.0;
+    z_min = -1.0;
+    z_max = +1.0;
+    z.set(z_min, z_max, Ns);
+    z.linspace();
     
-    file.open("figures/RCS1/figure1.txt", 'w');
+    file.open("figures/near_field/figure1.txt", 'w');
     for (size_t i=0; i<Ns; i++){
-        progress_bar(i, Ns, "computing RCS...");
-        RCS = engine.RCS_plane_wave_2d(theta_s(i), phi_s);
-        file.write("%21.14E %21.14E %21.14E\n", rad2deg(theta_s(i)), 
-            10.0*log10(RCS.sigma_theta/pow(lambda, 2.0)), 
-            10.0*log10(RCS.sigma_phi/pow(lambda, 2.0)));
+        progress_bar(i, Ns, "computing near fields...");
+        vector_t<real_t>p(x, y, z(i));
+        field_s = engine.compute_near_field(p);
+        field_i = engine.compute_incident_plane_wave_field(theta_i, phi_i, E_TM, E_TE, p);
+        file.write("%21.14E %21.14E %21.14E %21.14E\n", z(i), 
+            abs((field_i.E.x+field_s.E.x)), 
+            abs((field_i.E.y+field_s.E.y)), 
+            abs((field_i.E.z+field_s.E.z)));
     }
     file.close();
 
-    //// RCS phi-phi
-    theta_i = deg2rad(0.0);
-    phi_i = deg2rad(0.0);
-    E_TM = 0.0;
-    E_TE = 1.0;
+    z.unset();
+}
+
+void test_near_field_heat_map_2d(){
+
+    timer_lib_t timer;
+
+    // medium parameters
+    const real_t GHz=1.0E+9;
+    real_t freq=0.5*GHz;
+    real_t mu=1.0, eps=1.0;
+
+    engine_2d_t engine;  
+    engine.set_medium(mu, eps, freq);
+
+    shape_info_t shape_info=engine.get_shape_info();
+    real_t lambda=shape_info.lambda; 
+    const real_t clmax=0.2*lambda;
+    engine.mesh("FreeCAD/test_sphere.geo", clmax);
+    
+    //// find Z_mn
+    // timer.set();
+    // engine.compute_Z_mn();
+    // timer.unset();
+    
+    real_t theta_i, phi_i;
+    complex_t E_TM, E_TE;
+
+    field_2d_t field_s, field_i;
+    file_t file;
+    range_t x, z;
+    real_t z_min, z_max, y, x_min, x_max;
+    const size_t Ns=101;
+
+    //// 
+    theta_i = deg2rad(90.0);
+    phi_i = deg2rad(180.0);
+    E_TM = 1.0;
+    E_TE = 0.0;
 
     engine.compute_V_m_plane_wave(E_TM, E_TE, theta_i, phi_i);
     engine.solve_currents();
 
-    phi_s = deg2rad(0.0);
-    theta_s_min = deg2rad(-180.0);
-    theta_s_max = deg2rad(+180.0);
-    theta_s.set(theta_s_min, theta_s_max, Ns);
-    theta_s.linspace();
+    y = 0.0;
+    x_min = -1.0;
+    x_max = +1.0;
+    z_min = -1.0;
+    z_max = +1.0;
+    x.set(x_min, x_max, Ns);
+    z.set(z_min, z_max, Ns);
+    x.linspace();
+    z.linspace();
     
-    file.open("figures/RCS1/figure2.txt", 'w');
+    file.open("figures/near_field/figure2.txt", 'w');
+    size_t counter=0;
     for (size_t i=0; i<Ns; i++){
-        progress_bar(i, Ns, "computing RCS...");
-        RCS = engine.RCS_plane_wave_2d(theta_s(i), phi_s);
-        file.write("%21.14E %21.14E %21.14E\n", rad2deg(theta_s(i)), 
-            10.0*log10(RCS.sigma_theta/pow(lambda, 2.0)), 
-            10.0*log10(RCS.sigma_phi/pow(lambda, 2.0)));
+        for (size_t j=0; j<Ns; j++){
+            progress_bar(counter++, Ns*Ns, "computing near fields...");
+            vector_t<real_t>p(x(i), y, z(j));
+            field_s = engine.compute_near_field(p);
+            field_i = engine.compute_incident_plane_wave_field(theta_i, phi_i, E_TM, E_TE, p);
+            file.write("%21.14E %21.14E %21.14E\n", x(i), z(j), 
+                mag(field_s.E+field_i.E));
+        }
+        file.write("\n");
     }
     file.close();
 
+    x.unset();
+    z.unset();
 }

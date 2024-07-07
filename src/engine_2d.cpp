@@ -37,6 +37,9 @@ struct integrand_2d_args{
     real_t theta_i=0.0, phi_i=0.0;
     real_t theta_s=0.0, phi_s=0.0;
     complex_t E_TM=0.0, E_TE=0.0;
+    vector_t<real_t> p=vector_t<real_t>(0.0, 0.0, 0.0); 
+    vector_t<real_t> direction=vector_t<real_t>(0.0, 0.0, 0.0);
+    engine_2d_t *engine=null;
 };
 
 // phi terms
@@ -411,6 +414,71 @@ complex_t V_m_plane_wave_2d(const basis_2d_t basis_m, const complex_t E_TM, cons
     return I_V;
 }
 
+// near-field terms
+
+complex_t integrand_E_2d(const complex_t alpha_n, const complex_t beta_n, void *args_){
+    integrand_2d_args *args=(integrand_2d_args*)args_;
+    vector_t<real_t> p=args->p;
+    vector_t<real_t> direction=args->direction;
+    vector_t<real_t> rho_m, rho_p;
+    basis_2d_t basis_n;
+    engine_2d_t *engine=args->engine;
+    complex_t k=engine->k;
+    complex_t eta=engine->eta;
+    complex_t sum=0.0;
+    for (size_t n=0; n<engine->N; n++){
+        basis_n = engine->shape.get_basis_2d(n);
+        rho_m = +1.0*(real(alpha_n)*basis_n.L_m1+real(beta_n)*basis_n.L_m2);
+        rho_p = -1.0*(real(alpha_n)*basis_n.L_p1+real(beta_n)*basis_n.L_p2);
+        real_t R_m, R_p;
+        R_m = mag(p-(basis_n.r_m+rho_m));
+        R_p = mag(p-(basis_n.r_p-rho_p));
+        const complex_t j=complex_t(0.0, 1.0);
+        complex_t g_m=exp(-j*k*R_m)/(4.0*pi*R_m);
+        complex_t g_p=exp(-j*k*R_p)/(4.0*pi*R_p);
+        vector_t<real_t> R_m_u=unit(p-(basis_n.r_m+rho_m));
+        vector_t<real_t> R_p_u=unit(p-(basis_n.r_p-rho_p));
+        complex_t I_A_m, I_A_p, I_B_m, I_B_p;
+        I_A_m = (direction*rho_m)*g_m;
+        I_A_p = (direction*rho_p)*g_p;
+        I_B_m = -2.0*((1.0+j*k*R_m)/R_m)*(direction*R_m_u)*g_m;
+        I_B_p = -2.0*((1.0+j*k*R_p)/R_p)*(direction*R_p_u)*g_p;
+        complex_t A, B;
+        A = (I_A_m+I_A_p);
+        B = (I_B_m-I_B_p);
+        sum+=-j*k*eta*basis_n.L*(A+B/(k*k))*engine->I_n(n, 0);
+    }
+    return sum;
+}
+
+field_2d_t engine_2d_t::compute_near_field(const vector_t<real_t> p){
+    this->shape.check();
+    assert_error(is_I_n_available, "no I_n solutions found");
+    integrand_2d_args args;
+    args.engine = this;
+    args.k = k;
+    args.p = p;
+    field_2d_t field;
+    vector_t<real_t>x_u(1.0, 0.0, 0.0);
+    vector_t<real_t>y_u(0.0, 1.0, 0.0);
+    vector_t<real_t>z_u(0.0, 0.0, 1.0);
+    //
+    triangle_domain_t triangle={vector_t<real_t>(0.0, 0.0, 0.0), vector_t<real_t>(1.0, 0.0, 0.0), vector_t<real_t>(0.0, 1.0, 0.0)};
+    this->quadl.set_2d(k_max, tol);
+    int flag=false;
+    args.direction = x_u;
+    field.E.x = this->quadl.integral_2d(integrand_E_2d, &args, triangle, flag);
+    if(flag){flag=false; print("warning: no convergence!\n");}
+    args.direction = y_u;
+    field.E.y = this->quadl.integral_2d(integrand_E_2d, &args, triangle, flag);
+    if(flag){flag=false; print("warning: no convergence!\n");}
+    args.direction = z_u;
+    field.E.z = this->quadl.integral_2d(integrand_E_2d, &args, triangle, flag);
+    if(flag){flag=false; print("warning: no convergence!\n");}
+    this->quadl.unset_2d();
+    return field;
+}
+
 //
 
 void engine_2d_t::save_Z_mn(const char *filename){
@@ -418,14 +486,14 @@ void engine_2d_t::save_Z_mn(const char *filename){
     assert(filename!=null);
     file.open(filename, 'w');
     file.write(&this->N);
-    if (true){print("saving Z_mn solutions...");}
+    print("saving Z_mn solutions...");
     for (size_t m=0; m<this->N; m++){
         for (size_t n=0; n<this->N; n++){
             file.write(&this->Z_mn(m, n));
         }
     }
     file.close();
-    if (true){print(", done\n");}
+    print(", done\n");
 }
 
 void engine_2d_t::load_Z_mn(const char *filename){
@@ -435,18 +503,18 @@ void engine_2d_t::load_Z_mn(const char *filename){
     file.read(&this->N);
     this->Z_mn.unset();
     this->Z_mn.set(this->N, this->N);
-    if (true){print("loading Z_mn solutions...");}
+    print("loading Z_mn solutions...");
     for (size_t m=0; m<this->N; m++){
         for (size_t n=0; n<this->N; n++){
             file.read(&this->Z_mn(m, n));
         }
     }
     file.close();
-    if (true){print(", done\n");}
+    print(", done\n");
     this->is_Z_mn_available = true;
 }
 
-//
+// RCS
 
 complex_t integrand_RCS_theta_2d(const complex_t alpha_n, const complex_t beta_n, void *args_){
     integrand_2d_args *args=(integrand_2d_args*)args_;
@@ -521,14 +589,14 @@ void engine_2d_t::mesh(const char *filename, const real_t clmax){
 void engine_2d_t::solve_currents(){
     this->load_Z_mn("data/Z_mn.bin");
     assert_error(this->is_V_m_available, "no V_m solutions found");
-    if (true){print("solving for I_n...");}
+    print("solving for I_n...");
     this->quadl.set_2d(k_max, tol);
     this->Z_mn.lup();
     this->I_n.set(this->N, 1);
     this->Z_mn.solve(this->V_m, this->I_n);
     this->quadl.unset_2d();
     this->is_I_n_available = true;
-    if (true){print(", done\n");}
+    print(", done\n");
 }
 
 void engine_2d_t::compute_Z_mn(){
@@ -596,7 +664,7 @@ void engine_2d_t::compute_V_m_plane_wave(const complex_t E_TM, const complex_t E
     this->is_V_m_available = true;
 }
 
-RCS_2d engine_2d_t::RCS_plane_wave_2d(const real_t theta_s, const real_t phi_s){
+RCS_2d_t engine_2d_t::RCS_plane_wave_2d(const real_t theta_s, const real_t phi_s){
     this->shape.check();
     this->quadl.set_2d(k_max, tol);
     assert_error(is_I_n_available, "no I_n solutions found");
@@ -605,7 +673,7 @@ RCS_2d engine_2d_t::RCS_plane_wave_2d(const real_t theta_s, const real_t phi_s){
     args.k = k;
     args.theta_s = theta_s;
     args.phi_s = phi_s;
-    RCS_2d RCS;
+    RCS_2d_t RCS;
     triangle_domain_t triangle={vector_t<real_t>(0.0, 0.0, 0.0), vector_t<real_t>(1.0, 0.0, 0.0), vector_t<real_t>(0.0, 1.0, 0.0)};
     complex_t sigma_theta=0.0;
     complex_t sigma_phi=0.0;
@@ -636,9 +704,37 @@ void engine_2d_t::reset(){
 }
 
 engine_2d_t::engine_2d_t(){
-
 }
 
 engine_2d_t::~engine_2d_t(){
-    engine_2d_t::reset();
+}
+
+field_2d_t incident_plane_wave_field(const real_t theta_i, const real_t phi_i,
+    const complex_t k, const complex_t eta, const complex_t E_TM, const complex_t E_TE,
+    const vector_t<real_t> p){
+    vector_t<real_t> k_i(sin(theta_i)*cos(phi_i), 
+                         sin(theta_i)*sin(phi_i), 
+                         cos(theta_i));
+    vector_t<real_t> theta_i_u(cos(theta_i)*cos(phi_i),
+                               cos(theta_i)*sin(phi_i),
+                               -sin(theta_i));
+    vector_t<real_t> phi_i_u(-sin(phi_i), cos(phi_i), 0.0);
+    field_2d_t field;
+    vector_t<real_t>x_u(1.0, 0.0, 0.0);
+    vector_t<real_t>y_u(0.0, 1.0, 0.0);
+    vector_t<real_t>z_u(0.0, 0.0, 1.0);
+    const complex_t j=complex_t(0.0, 1.0);
+    complex_t k_i_r=k*(k_i*p);
+    field.E.x = (E_TM*(theta_i_u*x_u)+E_TE*(phi_i_u*x_u))*exp(j*k_i_r);
+    field.E.y = (E_TM*(theta_i_u*y_u)+E_TE*(phi_i_u*y_u))*exp(j*k_i_r);
+    field.E.z = (E_TM*(theta_i_u*z_u)+E_TE*(phi_i_u*z_u))*exp(j*k_i_r);
+    field.H.x = (E_TE*(theta_i_u*x_u)-E_TM*(phi_i_u*x_u))*exp(j*k_i_r)/eta;
+    field.H.y = (E_TE*(theta_i_u*y_u)-E_TM*(phi_i_u*y_u))*exp(j*k_i_r)/eta;
+    field.H.z = (E_TE*(theta_i_u*z_u)-E_TM*(phi_i_u*z_u))*exp(j*k_i_r)/eta;
+    return field;
+}
+
+field_2d_t engine_2d_t::compute_incident_plane_wave_field(const real_t theta_i, const real_t phi_i,
+    const complex_t E_TM, const complex_t E_TE, const vector_t<real_t> p){
+    return incident_plane_wave_field(theta_i, phi_i, this->k, this->eta, E_TM, E_TE, p);
 }

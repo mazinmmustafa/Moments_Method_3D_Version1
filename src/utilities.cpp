@@ -60,7 +60,6 @@ range_t::range_t(){
 }
 
 range_t::~range_t(){
-    range_t::unset();
 }
 
 void range_t::linspace(){
@@ -182,6 +181,14 @@ complex_t sinc(const complex_t x){
 
 real_t sinc(const real_t x){
     return abs(x)<eps_sinc ? 1.0 : sin(x)/x;
+}
+
+complex_t sinc_dx(const complex_t x){
+    return abs(x)<eps_sinc ? 0.0 : (x*cos(x)-sin(x))/(x*x);
+}
+
+real_t sinc_dx(const real_t x){
+    return abs(x)<eps_sinc ? 0.0 : (x*cos(x)-sin(x))/(x*x);
 }
 
 real_t deg2rad(const real_t theta){

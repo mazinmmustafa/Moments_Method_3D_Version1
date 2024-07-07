@@ -88,6 +88,10 @@ real_t mag(const vector_t<real_t> A){
     return sqrt(A*A);
 }
 
+real_t mag(const vector_t<complex_t> A){
+    return sqrt(abs(A*A));
+}
+
 vector_t<real_t> unit(const vector_t<real_t> A){
     real_t A_mag=mag(A);
     return vector_t<real_t>(A.x/A_mag, A.y/A_mag, A.z/A_mag);
@@ -99,4 +103,12 @@ int is_equal(const vector_t<real_t> A, const vector_t<real_t> B, const real_t to
     }else{
         return false;
     }
+}
+
+vector_t<real_t> real_v(const vector_t<complex_t> A){
+    return vector_t<real_t>(real(A.x), real(A.y), real(A.z));
+}
+
+vector_t<real_t> imag_v(const vector_t<complex_t> A){
+    return vector_t<real_t>(imag(A.x), imag(A.y), imag(A.z));
 }
