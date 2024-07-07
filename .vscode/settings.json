@@ -3,6 +3,10 @@
         "complex": "cpp",
         "cmath": "cpp",
         "*.ipp": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "bitset": "cpp",
+        "chrono": "cpp",
+        "algorithm": "cpp",
+        "format": "cpp"
     }
 }

@@ -775,3 +775,90 @@ field_2d_t engine_2d_t::compute_incident_plane_wave_field(const real_t theta_i, 
     const complex_t E_TM, const complex_t E_TE, const vector_t<real_t> p){
     return incident_plane_wave_field(theta_i, phi_i, this->k, this->eta, E_TM, E_TE, p);
 }
+
+int is_inside_list(int *list, int index, const size_t N){
+    for (size_t i=0; i<N; i++){
+        if (index==list[i]){
+            return true;
+        }
+    }
+    return false;
+}
+
+void engine_2d_t::export_currents(){
+    file_t file;
+    basis_2d_t basis_n;
+    real_t alpha, beta;
+    alpha = beta = 1.0/3.0;
+    vector_t<complex_t> J_m, J_p;
+    const real_t tol=1.0E-6;
+    triangle_t *triangles_list=null, triangle, triangle_;
+    //
+    size_t N_triangles;
+    size_t dummy_size_t;
+    file.open("mesh/mesh/mesh_data.txt", 'r');
+    file.read("%zu", &N_triangles);
+    file.read("%zu", &N_triangles);
+    file.read("%zu", &N_triangles);
+    file.read("%zu", &dummy_size_t);
+    triangles_list = (triangle_t*)calloc(N_triangles, sizeof(triangles_list));
+    assert(triangles_list!=null);
+    file.open("mesh/mesh/mesh_2d.txt", 'r');
+    int dummy;
+    for (size_t i=0; i<N_triangles; i++){
+        file.read("%lf %lf %lf %d\n", &triangles_list[i].v[0].x, &triangles_list[i].v[0].y, &triangles_list[i].v[0].z, &dummy);
+        file.read("%lf %lf %lf %d\n", &triangles_list[i].v[1].x, &triangles_list[i].v[1].y, &triangles_list[i].v[1].z, &dummy);
+        file.read("%lf %lf %lf %d\n", &triangles_list[i].v[2].x, &triangles_list[i].v[2].y, &triangles_list[i].v[2].z, &dummy);
+        file.read("\n");
+    }
+    //
+    print("exporting currents...");
+    file.open("data/current.pos", 'w');
+    file.write("View \"background mesh\" {\n");
+    for (size_t i=0; i<N_triangles; i++){
+        triangle = triangles_list[i];
+        vector_t<complex_t> J;  
+        for (size_t n=0; n<N; n++){
+            basis_n = engine_2d_t::shape.get_basis_2d(n);
+            triangle_.v[0] = basis_n.r_m;
+            triangle_.v[1] = basis_n.e_1;
+            triangle_.v[2] = basis_n.e_2;
+            size_t count=0;
+            for (size_t ii=0; ii<3; ii++){
+                for (size_t jj=0; jj<3; jj++){
+                    if (is_equal(triangle.v[ii], triangle_.v[jj], tol)){
+                        count++;
+                    }
+                    if (count==2){
+                        J = J+(alpha*basis_n.L_m1+beta*basis_n.L_m2)*this->I_n(n, 0);
+                        count = 0;
+                        break;
+                    }
+                }
+            }
+            triangle_.v[0] = basis_n.r_p;
+            triangle_.v[1] = basis_n.e_1;
+            triangle_.v[2] = basis_n.e_2;
+            for (size_t ii=0; ii<3; ii++){
+                for (size_t jj=0; jj<3; jj++){
+                    if (is_equal(triangle.v[ii], triangle_.v[jj], tol)){
+                        count++;
+                    }
+                    if (count==2){
+                        J = J-(alpha*basis_n.L_p1+beta*basis_n.L_p2)*this->I_n(n, 0);
+                        count = 0;
+                        break;
+                    }
+                }
+            }
+        }
+        file.write("ST(%21.14E, %21.14E, %21.14E, ", triangle.v[0].x, triangle.v[0].y, triangle.v[0].z);
+        file.write("%21.14E, %21.14E, %21.14E, ", triangle.v[1].x, triangle.v[1].y, triangle.v[1].z);
+        file.write("%21.14E, %21.14E, %21.14E){", triangle.v[2].x, triangle.v[2].y, triangle.v[2].z);
+        file.write("%21.14E, %21.14E, %21.14E};\n", mag(J), mag(J), mag(J));
+    }
+    file.write("};\n");
+    file.close();
+    print(", done!\n");
+    free(triangles_list);
+}

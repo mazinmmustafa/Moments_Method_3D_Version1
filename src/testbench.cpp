@@ -749,7 +749,7 @@ void test_current_2d(){
 
     // medium parameters
     const real_t GHz=1.0E+9;
-    real_t freq=0.25*GHz;
+    real_t freq=1.0*GHz;
     real_t mu=1.0, eps=1.0;
 
     engine_2d_t engine;  
@@ -761,9 +761,9 @@ void test_current_2d(){
     engine.mesh("FreeCAD/test_sphere.geo", clmax);
     
     //// find Z_mn
-    // timer.set();
-    // engine.compute_Z_mn();
-    // timer.unset();
+    timer.set();
+    engine.compute_Z_mn();
+    timer.unset();
     
     real_t theta_i, phi_i;
     complex_t E_TM, E_TE;
@@ -777,7 +777,5 @@ void test_current_2d(){
     engine.compute_V_m_plane_wave(E_TM, E_TE, theta_i, phi_i);
     engine.solve_currents();
     engine.export_currents();
-
-
 
 }
