@@ -801,7 +801,7 @@ void engine_2d_t::export_currents(){
     file1.read("%zu", &N_triangles);
     file1.read("%zu", &dummy_size_t);
     file1.close();
-    triangles_list = (triangle_t*)calloc(N_triangles, sizeof(triangles_list));
+    triangles_list = (triangle_t*)calloc(N_triangles, sizeof(triangle_t));
     assert(triangles_list!=null);
     file2.open("mesh/mesh/mesh_2d.txt", 'r');
     int dummy1, dummy2, dummy3;
