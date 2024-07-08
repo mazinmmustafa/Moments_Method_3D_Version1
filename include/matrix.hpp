@@ -165,7 +165,7 @@ class matrix_t{
                 }
             }
             if (max_element==0.0){
-                print("warning: matrix is singular!\n");
+                assert_error(false, "matrix is singular");
             }
             if (i_max!=i) {
                 i_temp = this->P[i];

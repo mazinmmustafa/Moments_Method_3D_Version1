@@ -132,7 +132,7 @@ complex_t integrand_phi_2d_projection(const complex_t alpha_m, const complex_t b
         B = atan2(P0*l_p, R0*R0+d*R_p);
         C = atan2(P0*l_m, R0*R0+d*R_m);
         D = P0_u*u;
-        I_pm+=D*(A-d*(B-C));
+        I_pm+=D*(A-d*(B-C));        
         // pp
         R0 = para_pp.R0[i];
         R_m = para_pp.R_m[i];
@@ -364,7 +364,10 @@ complex_t Z_mn_2d(const basis_2d_t basis_m, const basis_2d_t basis_n, const comp
     complex_t psi=psi_2d(basis_m, basis_n, k, quadl, flag); if(flag){flag=false; print("warning: no convergence!\n");}
     complex_t phi=phi_2d(basis_m, basis_n, k, quadl, flag); if(flag){flag=false; print("warning: no convergence!\n");}
     const complex_t j=complex_t(0.0, 1.0);
-    return j*k*eta*psi-j*(eta/k)*phi;
+    complex_t Z=j*k*eta*psi-j*(eta/k)*phi;
+    assert_error(!isnan(abs(Z)), "nan value for Z_mn");
+    assert_error(!isinf(abs(Z)), "inf value for Z_mn");
+    return Z;
 }
 
 complex_t integrand_V_plane_wave_2d(const complex_t alpha_m, const complex_t beta_m, void *args_){

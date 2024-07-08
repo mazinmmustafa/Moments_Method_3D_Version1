@@ -1,6 +1,8 @@
 //
 #include "projection.hpp"
 
+const real_t eps_tol=1.0E-8;
+
 projection_1d_t get_projection_1d(const vector_t<real_t> v1, const vector_t<real_t> v2,
     const vector_t<real_t> p){
     projection_1d_t para_1d;
@@ -10,7 +12,7 @@ projection_1d_t get_projection_1d(const vector_t<real_t> v1, const vector_t<real
     vector_t<real_t> l=unit(v2-v1);
     para_1d.p0 = p0;
     para_1d.P0 = mag(p0-p);
-    para_1d.P0_u = unit(p0-p);
+    para_1d.P0_u = para_1d.P0<eps_tol ? vector_t<real_t>(0.0, 0.0, 0.0) : unit(p0-p);
     para_1d.l_m = (v1-p0)*l;
     para_1d.l_p = (v2-p0)*l;
     para_1d.P_m = mag(p-v1);
