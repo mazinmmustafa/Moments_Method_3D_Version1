@@ -101,6 +101,7 @@ void range_t::set(const real_t x_min, const real_t x_max, const size_t Ns){
 void range_t::unset(){
     if (this->is_allocated){
         free(this->data);
+        this->is_allocated = false;
         this->Ns = 0;
     }
 }

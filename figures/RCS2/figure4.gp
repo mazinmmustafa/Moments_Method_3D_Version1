@@ -20,7 +20,7 @@ set xtics 60
 # set arrow from 0.0, 0.0 to 20.0, 0.0 nohead linestyle 1 lc 'black' lw 2
 
 set xlabel '$\theta$ [deg]'
-set ylabel '$\sigma_{\varphi\theta}$ [dB]'
+set ylabel '$\sigma_{\theta\varphi}$ [dB]'
 # set title 'Bessel Functions'
 
 plot 'figure2.txt' using 1:2 with lines lw 2 dt 1 lc 16 title ''

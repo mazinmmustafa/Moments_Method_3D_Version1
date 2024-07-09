@@ -638,7 +638,6 @@ void engine_2d_t::solve_currents(){
     print("solving for I_n...");
     this->quadl.set_2d(k_max, tol);
     this->Z_mn.lup();
-    this->I_n.set(this->N, 1);
     this->Z_mn.solve(this->V_m, this->I_n);
     this->quadl.unset_2d();
     this->is_I_n_available = true;

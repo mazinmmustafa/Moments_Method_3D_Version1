@@ -203,7 +203,6 @@ class matrix_t{
         assert_error(this->rows==rows_b, "invalid matrix dimensions");
         assert_error(cols_b==1, "invalid matrix dimensions");
         const size_t N=this->rows;
-        x.set(N, 1);
         for (size_t i=0; i<N; i++){
             x(i, 0) = b(this->P[i], 0);
             for (size_t k=0; k<i; k++){
