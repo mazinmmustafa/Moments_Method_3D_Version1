@@ -21,9 +21,7 @@ quadl_t::~quadl_t(){
 }
 
 void quadl_t::set(const size_t N, const size_t k_max, const real_t tol){
-    if (this->is_allocated){
-        quadl_t::unset();
-    }
+    assert_error(this->is_allocated==false, "quad is already set");
     assert_error(tol>0.0, "invalid tolerance");
     this->N = N;
     this->k_max = k_max;

@@ -20,9 +20,9 @@ class matrix_t{
         ~matrix_t(){
         }
     void set(const size_t rows, const size_t cols){
-        if (this->is_allocated){
-            matrix_t::unset();
-        }
+        assert_error(this->is_allocated==false, "matrix is already set");
+        assert_error(this->is_P_allocated==false, "matrix is already set");
+        assert_error(this->is_set==false, "matrix is already set");
         assert_error(rows>0&&cols>0, "invalid dimensions");
         this->rows = rows;
         this->cols = cols;
