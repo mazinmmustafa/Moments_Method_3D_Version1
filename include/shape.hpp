@@ -9,7 +9,7 @@
 
 // Definitions
 
-const size_t __max_system__=18000;
+const size_t __max_system__=20000;
 
 struct edge_t{
     vector_t<real_t> v[2];
