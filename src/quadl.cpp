@@ -15,13 +15,9 @@ extern "C" void cgqf_f77_(int *rule, int *order, double *x, double *w);
 extern "C" void dunavant_rule_wrapper_(int *rule, int *order_num, double *x, double *y, double *w);
 
 quadl_t::quadl_t(){
-
 }
 
 quadl_t::~quadl_t(){
-    // if (this->is_allocated){
-    //     quadl_t::unset();
-    // }
 }
 
 void quadl_t::set(const size_t N, const size_t k_max, const real_t tol){

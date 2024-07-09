@@ -7,10 +7,10 @@ set output 'figure1.tex'
 set key top right
 
 set xrange [-180:+180]
-set yrange [-30:+30]
+# set yrange [-30:+30]
 
 set xtics 60
-set ytics 10
+# set ytics 10
 
 # set mxtics 20
 # set mytics 10

@@ -285,6 +285,7 @@ void test_engine_2d(){
 
     engine_2d_t engine;
     timer_lib_t timer;
+    const real_t lambda=1.0;
 
     quadl_domain_t quadl;
     const size_t k_max=10;
@@ -336,7 +337,7 @@ void test_engine_2d(){
     // basis_2d_t basis_m(v1_m, v2_m, v3_m, v4_m), basis_n(v1_m, v2_m, v3_m, v4_m);
 
     timer.set();
-    print(Z_mn_2d(basis_m, basis_n, k, eta, quadl));
+    print(Z_mn_2d(basis_m, basis_n, k, lambda, eta, quadl));
     timer.unset();
 
     quadl.unset_2d();
@@ -427,6 +428,7 @@ void test_Z_mn_2d(){
     file.close();
     theta_s.unset();
 
+    engine.unset();
 }
 
 //
@@ -515,8 +517,8 @@ void test_RCS_sphere_2d(){
     file.close();
     theta_s.unset();
 
+    engine.unset();
 }
-
 
 void test_RCS_shape_2d(){
 
@@ -524,7 +526,7 @@ void test_RCS_shape_2d(){
 
     // medium parameters
     const real_t GHz=1.0E+9;
-    real_t freq=0.5*GHz;
+    real_t freq=0.2*GHz;
     real_t mu=1.0, eps=1.0;
 
     engine_2d_t engine;  
@@ -533,7 +535,8 @@ void test_RCS_shape_2d(){
     shape_info_t shape_info=engine.get_shape_info();
     real_t lambda=shape_info.lambda; 
     const real_t clmax=0.2*lambda;
-    engine.mesh("FreeCAD/test_shape.geo", clmax);
+    // engine.mesh("FreeCAD/test_shape.geo", clmax);
+    engine.mesh("FreeCAD/test_jet.geo", clmax);
     
     //// find Z_mn
     timer.set();
@@ -551,7 +554,7 @@ void test_RCS_shape_2d(){
     const size_t Ns=1001;
 
     //// RCS theta-theta
-    theta_i = deg2rad(0.0);
+    theta_i = deg2rad(180.0);
     phi_i = deg2rad(0.0);
     E_TM = 1.0;
     E_TE = 0.0;
@@ -577,7 +580,7 @@ void test_RCS_shape_2d(){
     theta_s.unset();
 
     //// RCS phi-phi
-    theta_i = deg2rad(0.0);
+    theta_i = deg2rad(180.0);
     phi_i = deg2rad(0.0);
     E_TM = 0.0;
     E_TE = 1.0;
@@ -602,8 +605,7 @@ void test_RCS_shape_2d(){
     file.close();
 
     theta_s.unset();
-
-    engine.reset();
+    engine.unset();
 }
 
 //
@@ -667,8 +669,9 @@ void test_near_field_2d(){
             abs((field_i.E.z+field_s.E.z)));
     }
     file.close();
-
     z.unset();
+
+    engine.unset();
 }
 
 void test_near_field_heat_map_2d(){
@@ -743,6 +746,7 @@ void test_near_field_heat_map_2d(){
 
     x.unset();
     z.unset();
+    engine.unset();
 }
 
 void test_current_2d(){
@@ -780,5 +784,5 @@ void test_current_2d(){
     engine.solve_currents();
     engine.export_currents();
 
-    engine.reset();
+    engine.unset();
 }

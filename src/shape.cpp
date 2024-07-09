@@ -1,12 +1,12 @@
 //
 #include "shape.hpp"
 
-shape_t::shape_t(){
+const real_t tol_vertex=1.0E-4;
 
+shape_t::shape_t(){
 }
 
 shape_t::~shape_t(){
-    // shape_t::unset();
 }
 
 void shape_t::unset(){
@@ -260,7 +260,7 @@ void shape_t::get_basis_functions(){
             index_edge_d = 0;
             for (size_t ii=0; ii<2; ii++){
                 for (size_t jj=0; jj<2; jj++){
-                    if (is_equal(edge_s.v[ii], edge_d.v[jj], tol_vertex)){
+                    if (is_equal(edge_s.v[ii], edge_d.v[jj], this->lambda*tol_vertex)){
                         new_edge[count] = ii;
                         index_edge_s+=ii;
                         index_edge_d+=jj;
@@ -311,7 +311,7 @@ void shape_t::get_basis_functions(){
             index_triangle_d = 0;
             for (size_t ii=0; ii<3; ii++){
                 for (size_t jj=0; jj<3; jj++){
-                    if (is_equal(triangle_s.v[ii], triangle_d.v[jj], tol_vertex)){
+                    if (is_equal(triangle_s.v[ii], triangle_d.v[jj], this->lambda*tol_vertex)){
                         new_triangle[count] = ii;
                         index_triangle_s+=ii;
                         index_triangle_d+=jj;
@@ -366,7 +366,7 @@ void shape_t::get_basis_functions(){
             index_tetrahedron_d = 0;
             for (size_t ii=0; ii<4; ii++){
                 for (size_t jj=0; jj<4; jj++){
-                    if (is_equal(tetrahedron_s.v[ii], tetrahedron_d.v[jj], tol_vertex)){
+                    if (is_equal(tetrahedron_s.v[ii], tetrahedron_d.v[jj], this->lambda*tol_vertex)){
                         new_tetrahedron[count] = ii;
                         index_tetrahedron_s+=ii;
                         index_tetrahedron_d+=jj;
@@ -554,6 +554,7 @@ void shape_t::set_medium(const complex_t mu, const complex_t eps, const real_t f
 }
 
 void shape_t::mesh_1d(const char *gmsh_filename, const real_t clmax){
+    assert_error(this->is_medium_set, "medium is not set yet");
     int_t return_value;
     char *cmd=(char*)calloc(200, sizeof(char));
     sprintf(cmd, "gmsh mesh/%s -1 -clmax %0.4f -format vtk -save_all -o mesh/shape.vtk", 
@@ -564,6 +565,7 @@ void shape_t::mesh_1d(const char *gmsh_filename, const real_t clmax){
 }
 
 void shape_t::mesh_2d(const char *gmsh_filename, const real_t clmax){
+    assert_error(this->is_medium_set, "medium is not set yet");
     int_t return_value;
     char *cmd=(char*)calloc(200, sizeof(char));
     sprintf(cmd, "gmsh mesh/%s -2 -clmax %0.4f -format vtk -save_all -o mesh/shape.vtk", 
@@ -574,6 +576,7 @@ void shape_t::mesh_2d(const char *gmsh_filename, const real_t clmax){
 }
 
 void shape_t::mesh_3d(const char *gmsh_filename, const real_t clmax){
+    assert_error(this->is_medium_set, "medium is not set yet");
     int_t return_value;
     char *cmd=(char*)calloc(200, sizeof(char));
     sprintf(cmd, "gmsh mesh/%s -3 -clmax %0.4f -format vtk -save_all -o mesh/shape.vtk", 

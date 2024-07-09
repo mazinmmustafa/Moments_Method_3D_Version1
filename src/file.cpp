@@ -9,9 +9,7 @@ file_t::~file_t(){
 }
 
 void file_t::open(const char *filename, const char mode){
-    if (this->is_open){
-        file_t::close();
-    }
+    assert_error(this->is_open==false, "file is already open");
     this->filename = (char*)calloc(this->max_length, sizeof(char));
     assert(this->filename!=null);
     strcpy(this->filename, filename);

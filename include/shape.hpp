@@ -11,8 +11,6 @@
 
 const size_t __max_system__=18000;
 
-const real_t tol_vertex=1.0E-6;
-
 struct edge_t{
     vector_t<real_t> v[2];
     int_t physical_group=0;

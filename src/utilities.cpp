@@ -87,9 +87,7 @@ real_t range_t::operator() (const size_t index) const{
 }
 
 void range_t::set(const real_t x_min, const real_t x_max, const size_t Ns){
-    if (this->is_allocated){
-        range_t::unset();
-    }
+    assert_error(this->is_allocated==false, "range is already set");
     assert_error(Ns>0, "invalid number of samples");
     this->Ns = Ns;
     assert_error(x_max>x_min, "invalid range index");

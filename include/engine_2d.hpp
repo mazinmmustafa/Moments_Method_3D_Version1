@@ -25,10 +25,8 @@ struct field_2d_t{
 
 class engine_2d_t{
     private:
-        
         quadl_domain_t quadl;
-        
-        const size_t k_max=25;
+        const size_t k_max=40;
         const real_t tol=1.0E-3;
         int is_Z_mn_available=false;
         int is_V_m_available=false;
@@ -54,7 +52,7 @@ class engine_2d_t{
         void set_medium(const complex_t mu, const complex_t eps, const real_t freq);
         void mesh(const char *filename, const real_t clmax);
         void solve_currents();
-        void reset();
+        void unset();
         shape_info_t get_shape_info(){
             return this->shape.get_shape_info();
         }
@@ -65,10 +63,10 @@ class engine_2d_t{
 
 // Functions
 complex_t psi_2d(const basis_2d_t basis_m, const basis_2d_t basis_n, const complex_t k, 
-    quadl_domain_t quadl, int &flag);
+    const real_t lambda, quadl_domain_t quadl, int &flag);
 complex_t phi_2d(const basis_2d_t basis_m, const basis_2d_t basis_n, const complex_t k, 
-    quadl_domain_t quadl, int &flag);
+    const real_t lambda, quadl_domain_t quadl, int &flag);
 complex_t Z_mn_2d(const basis_2d_t basis_m, const basis_2d_t basis_n, const complex_t k, 
-    const complex_t eta, quadl_domain_t quadl);
+    const real_t lambda, const complex_t eta, quadl_domain_t quadl);
 
 #endif

@@ -3,6 +3,20 @@
 
 const size_t line_max=100;
 
+struct integrand_2d_args{
+    basis_2d_t basis_m, basis_n;
+    complex_t k=0.0;
+    quadl_domain_t quadl;
+    complex_t alpha_m=0.0, beta_m=0.0;
+    real_t theta_i=0.0, phi_i=0.0;
+    real_t theta_s=0.0, phi_s=0.0;
+    complex_t E_TM=0.0, E_TE=0.0;
+    vector_t<real_t> p=vector_t<real_t>(0.0, 0.0, 0.0); 
+    vector_t<real_t> direction=vector_t<real_t>(0.0, 0.0, 0.0);
+    real_t lambda=0.0;
+    engine_2d_t *engine=null;
+};
+
 void R_mn_2d(const real_t alpha_m, const real_t beta_m, const real_t alpha_n, const real_t beta_n, 
     const basis_2d_t &basis_m, const basis_2d_t &basis_n, 
     real_t &R_mn_mm, real_t &R_mn_mp, real_t &R_mn_pm, real_t &R_mn_pp){
@@ -28,19 +42,6 @@ void g_mn_2d(const real_t alpha_m, const real_t beta_m, const real_t alpha_n, co
     g_mn_pm = exp(-j*k*R_mn_pm)/(4.0*pi*R_mn_pm);
     g_mn_pp = exp(-j*k*R_mn_pp)/(4.0*pi*R_mn_pp);
 }
-
-struct integrand_2d_args{
-    basis_2d_t basis_m, basis_n;
-    complex_t k=0.0;
-    quadl_domain_t quadl;
-    complex_t alpha_m=0.0, beta_m=0.0;
-    real_t theta_i=0.0, phi_i=0.0;
-    real_t theta_s=0.0, phi_s=0.0;
-    complex_t E_TM=0.0, E_TE=0.0;
-    vector_t<real_t> p=vector_t<real_t>(0.0, 0.0, 0.0); 
-    vector_t<real_t> direction=vector_t<real_t>(0.0, 0.0, 0.0);
-    engine_2d_t *engine=null;
-};
 
 // phi terms
 
@@ -75,15 +76,16 @@ complex_t integrand_phi_2d_projection(const complex_t alpha_m, const complex_t b
     integrand_2d_args *args=(integrand_2d_args*)args_;
     basis_2d_t basis_m=args->basis_m;
     basis_2d_t basis_n=args->basis_n;
+    real_t lambda=args->lambda;
     real_t l_m, l_p, R_m, R_p, R0, P0, d;
     vector_t<real_t> P0_u, u;
     real_t I_mm, I_mp, I_pm, I_pp;
     vector_t<real_t> rho_m=basis_m.r_m+real(alpha_m)*basis_m.L_m1+real(beta_m)*basis_m.L_m2;
     vector_t<real_t> rho_p=basis_m.r_p+real(alpha_m)*basis_m.L_p1+real(beta_m)*basis_m.L_p2;
-    projection_2d_t para_mm=get_projection_2d(basis_n.r_m, basis_n.e_1, basis_n.e_2, rho_m);
-    projection_2d_t para_mp=get_projection_2d(basis_n.r_p, basis_n.e_2, basis_n.e_1, rho_m);
-    projection_2d_t para_pm=get_projection_2d(basis_n.r_m, basis_n.e_1, basis_n.e_2, rho_p);
-    projection_2d_t para_pp=get_projection_2d(basis_n.r_p, basis_n.e_2, basis_n.e_1, rho_p);
+    projection_2d_t para_mm=get_projection_2d(basis_n.r_m, basis_n.e_1, basis_n.e_2, rho_m, lambda);
+    projection_2d_t para_mp=get_projection_2d(basis_n.r_p, basis_n.e_2, basis_n.e_1, rho_m, lambda);
+    projection_2d_t para_pm=get_projection_2d(basis_n.r_m, basis_n.e_1, basis_n.e_2, rho_p, lambda);
+    projection_2d_t para_pp=get_projection_2d(basis_n.r_p, basis_n.e_2, basis_n.e_1, rho_p, lambda);
     //
     I_mm = I_mp = I_pm = I_pp = 0.0;
     real_t A, B, C, D;
@@ -153,8 +155,9 @@ complex_t integrand_phi_2d_projection(const complex_t alpha_m, const complex_t b
 }
 
 complex_t phi_2d(const basis_2d_t basis_m, const basis_2d_t basis_n, const complex_t k, 
-    quadl_domain_t quadl, int &flag){
+    const real_t lambda, quadl_domain_t quadl, int &flag){
     integrand_2d_args args={basis_m, basis_n, k, quadl, 0, 0};
+    args.lambda = lambda;
     triangle_domain_t triangle={vector_t<real_t>(0.0, 0.0, 0.0), vector_t<real_t>(1.0, 0.0, 0.0), vector_t<real_t>(0.0, 1.0, 0.0)};
     return args.quadl.integral_2d(integrand_phi_2d_projection, &args, triangle, flag)+
         args.quadl.integral_2d(integrand_phi_2d_outer, &args, triangle, flag);
@@ -198,15 +201,16 @@ complex_t integrand_psi_2d_projection_1(const complex_t alpha_m, const complex_t
     integrand_2d_args *args=(integrand_2d_args*)args_;
     basis_2d_t basis_m=args->basis_m;
     basis_2d_t basis_n=args->basis_n;
+    real_t lambda=args->lambda;
     real_t l_m, l_p, R_m, R_p, R0, P0, d;
     vector_t<real_t> P0_u, u;
     real_t I_mm, I_mp, I_pm, I_pp;
     vector_t<real_t> rho_m=basis_m.r_m+real(alpha_m)*basis_m.L_m1+real(beta_m)*basis_m.L_m2;
     vector_t<real_t> rho_p=basis_m.r_p+real(alpha_m)*basis_m.L_p1+real(beta_m)*basis_m.L_p2;
-    projection_2d_t para_mm=get_projection_2d(basis_n.r_m, basis_n.e_1, basis_n.e_2, rho_m);
-    projection_2d_t para_mp=get_projection_2d(basis_n.r_p, basis_n.e_2, basis_n.e_1, rho_m);
-    projection_2d_t para_pm=get_projection_2d(basis_n.r_m, basis_n.e_1, basis_n.e_2, rho_p);
-    projection_2d_t para_pp=get_projection_2d(basis_n.r_p, basis_n.e_2, basis_n.e_1, rho_p);
+    projection_2d_t para_mm=get_projection_2d(basis_n.r_m, basis_n.e_1, basis_n.e_2, rho_m, lambda);
+    projection_2d_t para_mp=get_projection_2d(basis_n.r_p, basis_n.e_2, basis_n.e_1, rho_m, lambda);
+    projection_2d_t para_pm=get_projection_2d(basis_n.r_m, basis_n.e_1, basis_n.e_2, rho_p, lambda);
+    projection_2d_t para_pp=get_projection_2d(basis_n.r_p, basis_n.e_2, basis_n.e_1, rho_p, lambda);
     vector_t<real_t> rho_n_m, rho_n_p;
     vector_t<real_t> rho_m_m=+1.0*(real(alpha_m)*basis_m.L_m1+real(beta_m)*basis_m.L_m2);
     vector_t<real_t> rho_m_p=-1.0*(real(alpha_m)*basis_m.L_p1+real(beta_m)*basis_m.L_p2);
@@ -286,15 +290,16 @@ complex_t integrand_psi_2d_projection_2(const complex_t alpha_m, const complex_t
     integrand_2d_args *args=(integrand_2d_args*)args_;
     basis_2d_t basis_m=args->basis_m;
     basis_2d_t basis_n=args->basis_n;
+    real_t lambda=args->lambda;
     real_t l_m, l_p, R_m, R_p, R0;
     vector_t<real_t> u;
     real_t I_mm, I_mp, I_pm, I_pp;
     vector_t<real_t> rho_m=basis_m.r_m+real(alpha_m)*basis_m.L_m1+real(beta_m)*basis_m.L_m2;
     vector_t<real_t> rho_p=basis_m.r_p+real(alpha_m)*basis_m.L_p1+real(beta_m)*basis_m.L_p2;
-    projection_2d_t para_mm=get_projection_2d(basis_n.r_m, basis_n.e_1, basis_n.e_2, rho_m);
-    projection_2d_t para_mp=get_projection_2d(basis_n.r_p, basis_n.e_2, basis_n.e_1, rho_m);
-    projection_2d_t para_pm=get_projection_2d(basis_n.r_m, basis_n.e_1, basis_n.e_2, rho_p);
-    projection_2d_t para_pp=get_projection_2d(basis_n.r_p, basis_n.e_2, basis_n.e_1, rho_p);
+    projection_2d_t para_mm=get_projection_2d(basis_n.r_m, basis_n.e_1, basis_n.e_2, rho_m, lambda);
+    projection_2d_t para_mp=get_projection_2d(basis_n.r_p, basis_n.e_2, basis_n.e_1, rho_m, lambda);
+    projection_2d_t para_pm=get_projection_2d(basis_n.r_m, basis_n.e_1, basis_n.e_2, rho_p, lambda);
+    projection_2d_t para_pp=get_projection_2d(basis_n.r_p, basis_n.e_2, basis_n.e_1, rho_p, lambda);
     vector_t<real_t> rho_m_m=+1.0*(real(alpha_m)*basis_m.L_m1+real(beta_m)*basis_m.L_m2);
     vector_t<real_t> rho_m_p=-1.0*(real(alpha_m)*basis_m.L_p1+real(beta_m)*basis_m.L_p2);
     //
@@ -349,9 +354,10 @@ complex_t integrand_psi_2d_projection_2(const complex_t alpha_m, const complex_t
     return (basis_m.L*basis_n.L/(8.0*pi))*(I_mm/basis_n.A_m-I_mp/basis_n.A_p+I_pm/basis_n.A_m-I_pp/basis_n.A_p);
 }
 
-complex_t psi_2d(const basis_2d_t basis_m, const basis_2d_t basis_n, const complex_t k, 
-    quadl_domain_t quadl, int &flag){
+complex_t psi_2d(const basis_2d_t basis_m, const basis_2d_t basis_n, const complex_t k,
+    const real_t lambda, quadl_domain_t quadl, int &flag){
     integrand_2d_args args={basis_m, basis_n, k, quadl, 0, 0};
+    args.lambda = lambda;
     triangle_domain_t triangle={vector_t<real_t>(0.0, 0.0, 0.0), vector_t<real_t>(1.0, 0.0, 0.0), vector_t<real_t>(0.0, 1.0, 0.0)};
     return args.quadl.integral_2d(integrand_psi_2d_projection_1, &args, triangle, flag)+
             args.quadl.integral_2d(integrand_psi_2d_projection_2, &args, triangle, flag)+
@@ -359,10 +365,10 @@ complex_t psi_2d(const basis_2d_t basis_m, const basis_2d_t basis_n, const compl
 }
 
 complex_t Z_mn_2d(const basis_2d_t basis_m, const basis_2d_t basis_n, const complex_t k, 
-    const complex_t eta, quadl_domain_t quadl){
+    const real_t lambda, const complex_t eta, quadl_domain_t quadl){
     int flag=false;
-    complex_t psi=psi_2d(basis_m, basis_n, k, quadl, flag); if(flag){flag=false; print("warning: no convergence!\n");}
-    complex_t phi=phi_2d(basis_m, basis_n, k, quadl, flag); if(flag){flag=false; print("warning: no convergence!\n");}
+    complex_t psi=psi_2d(basis_m, basis_n, k, lambda, quadl, flag); if(flag){flag=false; print("warning: no convergence!\n");}
+    complex_t phi=phi_2d(basis_m, basis_n, k, lambda, quadl, flag); if(flag){flag=false; print("warning: no convergence!\n");}
     const complex_t j=complex_t(0.0, 1.0);
     complex_t Z=j*k*eta*psi-j*(eta/k)*phi;
     assert_error(!isnan(abs(Z)), "nan value for Z_mn");
@@ -651,7 +657,7 @@ void engine_2d_t::compute_Z_mn(){
         basis_m = this->shape.get_basis_2d(m);
         for (size_t n=m; n<N; n++){
             basis_n = this->shape.get_basis_2d(n);
-            this->Z_mn(m, n) = Z_mn_2d(basis_m, basis_n, k, eta, this->quadl);
+            this->Z_mn(m, n) = Z_mn_2d(basis_m, basis_n, k, lambda, eta, this->quadl);
             count++;
         }
         for (size_t n=m+1; n<N; n++){
@@ -674,7 +680,7 @@ void engine_2d_t::compute_Z_mn(){
             basis_n = this->shape.get_basis_2d(n);
             sprintf(msg, "Z_mn (%zu, %zu)", m, n);
             progress_bar(count, N*(N+1)/2, msg);
-            this->Z_mn(m, n) = Z_mn_2d(basis_m, basis_n, k, eta, this->quadl);
+            this->Z_mn(m, n) = Z_mn_2d(basis_m, basis_n, k, lambda, eta, this->quadl);
             count++;
         }
         for (size_t n=m+1; n<N; n++){
@@ -729,7 +735,7 @@ RCS_2d_t engine_2d_t::RCS_plane_wave_2d(const real_t theta_s, const real_t phi_s
     return RCS;
 }
 
-void engine_2d_t::reset(){
+void engine_2d_t::unset(){
     this->N = 0;
     this->k = 0.0;
     this->eta = 0.0;
