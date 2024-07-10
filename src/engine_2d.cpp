@@ -827,6 +827,7 @@ void engine_2d_t::export_currents(){
     for (size_t i=0; i<N_triangles; i++){
         triangle = triangles_list[i];
         vector_t<complex_t> J;  
+        progress_bar(i, N_triangles, "exporting currents...");
         for (size_t n=0; n<N; n++){
             basis_n = engine_2d_t::shape.get_basis_2d(n);
             triangle_.v[0] = basis_n.r_m;
@@ -835,7 +836,7 @@ void engine_2d_t::export_currents(){
             size_t count=0;
             for (size_t ii=0; ii<3; ii++){
                 for (size_t jj=0; jj<3; jj++){
-                    if (is_equal(triangle.v[ii], triangle_.v[jj], tol)){
+                    if (is_equal(triangle.v[ii], triangle_.v[jj], tol*this->lambda)){
                         count++;
                     }
                     if (count==2){
@@ -850,7 +851,7 @@ void engine_2d_t::export_currents(){
             triangle_.v[2] = basis_n.e_2;
             for (size_t ii=0; ii<3; ii++){
                 for (size_t jj=0; jj<3; jj++){
-                    if (is_equal(triangle.v[ii], triangle_.v[jj], tol)){
+                    if (is_equal(triangle.v[ii], triangle_.v[jj], tol*this->lambda)){
                         count++;
                     }
                     if (count==2){

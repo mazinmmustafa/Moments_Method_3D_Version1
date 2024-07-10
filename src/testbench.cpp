@@ -763,7 +763,7 @@ void test_current_2d(){
 
     shape_info_t shape_info=engine.get_shape_info();
     real_t lambda=shape_info.lambda; 
-    const real_t clmax=0.08*lambda;
+    const real_t clmax=0.2*lambda;
     engine.mesh("FreeCAD/test_sphere.geo", clmax);
     
     //// find Z_mn
@@ -775,10 +775,10 @@ void test_current_2d(){
     complex_t E_TM, E_TE;
 
     //// 
-    theta_i = deg2rad(30.0);
-    phi_i = deg2rad(45.0);
-    E_TM = 0.8;
-    E_TE = 0.4;
+    theta_i = deg2rad(0.0);
+    phi_i = deg2rad(0.0);
+    E_TM = 1.0;
+    E_TE = 0.0;
 
     engine.compute_V_m_plane_wave(E_TM, E_TE, theta_i, phi_i);
     engine.solve_currents();
