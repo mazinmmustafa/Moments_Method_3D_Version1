@@ -21,6 +21,8 @@ struct RCS_2d_t{
 struct field_2d_t{
     vector_t<complex_t> E=vector_t<complex_t>(0.0, 0.0, 0.0);
     vector_t<complex_t> H=vector_t<complex_t>(0.0, 0.0, 0.0);
+    complex_t E_theta=0.0, E_phi=0.0;
+    complex_t H_theta=0.0, H_phi=0.0;
 };
 
 class engine_2d_t{
@@ -47,6 +49,7 @@ class engine_2d_t{
             const real_t theta_i, const real_t phi);
         RCS_2d_t RCS_plane_wave_2d(const real_t theta_s, const real_t phi_s);
         field_2d_t compute_near_field(const vector_t<real_t> p);
+        field_2d_t compute_far_field(const real_t theta_s, const real_t phi_s);
         //
         size_t get_N(){return this->N;}
         void set_medium(const complex_t mu, const complex_t eps, const real_t freq);

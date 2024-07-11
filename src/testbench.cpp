@@ -786,3 +786,80 @@ void test_current_2d(){
 
     engine.unset();
 }
+
+void test_far_field_2d(){
+
+    timer_lib_t timer;
+
+    // medium parameters
+    const real_t GHz=1.0E+9;
+    real_t freq=0.2*GHz;
+    real_t mu=1.0, eps=1.0;
+
+    engine_2d_t engine;  
+    engine.set_medium(mu, eps, freq);
+
+    shape_info_t shape_info=engine.get_shape_info();
+    real_t lambda=shape_info.lambda; 
+    const real_t clmax=0.2*lambda;
+    engine.mesh("FreeCAD/test_shape.geo", clmax);
+    
+    //// find Z_mn
+    // timer.set();
+    // engine.compute_Z_mn();
+    // timer.unset();
+    
+    real_t theta_i, phi_i;
+    complex_t E_TM, E_TE;
+
+    field_2d_t field;
+    file_t file;
+    real_t phi_s;
+    real_t theta_s_min, theta_s_max;
+    range_t theta_s;
+    const size_t Ns=1001;
+
+    //// far-field
+    theta_i = deg2rad(0.0);
+    phi_i = deg2rad(0.0);
+    E_TM = 1.0;
+    E_TE = 0.0;
+
+    engine.compute_V_m_plane_wave(E_TM, E_TE, theta_i, phi_i);
+    engine.solve_currents();
+
+    phi_s = deg2rad(0.0);
+    theta_s_min = deg2rad(-180.0);
+    theta_s_max = deg2rad(+180.0);
+    theta_s.set(theta_s_min, theta_s_max, Ns);
+    theta_s.linspace();
+    
+    complex_t *E_theta=(complex_t*)calloc(Ns, sizeof(complex_t));
+    complex_t *E_phi=(complex_t*)calloc(Ns, sizeof(complex_t));
+    
+    real_t E_theta_max=0.0, E_phi_max=0.0;
+    for (size_t i=0; i<Ns; i++){
+        progress_bar(i, Ns, "computing far-fields...");
+        field = engine.compute_far_field(theta_s(i), phi_s);
+        E_theta[i] = field.E_theta;
+        E_phi[i] = field.E_phi;
+        if (abs(E_theta[i])>E_theta_max){E_theta_max = abs(E_theta[i]);}
+        if (abs(E_phi[i])>E_phi_max){E_phi_max = abs(E_phi[i]);}
+    }
+    
+    file.open("figures/far_field/figure1.txt", 'w');
+
+    for (size_t i=0; i<Ns; i++){
+        file.write("%21.14E %21.14E %21.14E\n", theta_s(i), 
+            20.0*log10(abs(E_theta[i])/E_theta_max), 
+            20.0*log10(abs(E_phi[i])/E_phi_max));
+    }
+    
+    file.close();
+    theta_s.unset();
+
+    free(E_theta);
+    free(E_phi);
+
+    engine.unset();
+}

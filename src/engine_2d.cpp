@@ -734,6 +734,31 @@ RCS_2d_t engine_2d_t::RCS_plane_wave_2d(const real_t theta_s, const real_t phi_s
     return RCS;
 }
 
+field_2d_t engine_2d_t::compute_far_field(const real_t theta_s, const real_t phi_s){
+    this->shape.check();
+    this->quadl.set_2d(k_max, tol);
+    assert_error(is_I_n_available, "no I_n solutions found");
+    int flag=false;
+    integrand_2d_args args;
+    args.k = k;
+    args.theta_s = theta_s;
+    args.phi_s = phi_s;
+    field_2d_t field;
+    triangle_domain_t triangle={vector_t<real_t>(0.0, 0.0, 0.0), vector_t<real_t>(1.0, 0.0, 0.0), vector_t<real_t>(0.0, 1.0, 0.0)};
+    for (size_t n=0; n<this->N; n++){
+        args.basis_n = this->shape.get_basis_2d(n);
+        field.E_theta+=this->quadl.integral_2d(integrand_RCS_theta_2d, &args, triangle, flag)*this->I_n(n, 0);
+        if(flag){flag=false; print("warning: no convergence!\n");}
+        field.E_phi+=this->quadl.integral_2d(integrand_RCS_phi_2d, &args, triangle, flag)*this->I_n(n, 0);
+        if(flag){flag=false; print("warning: no convergence!\n");}
+    }
+    const complex_t j=complex_t(0.0, 1.0);
+    field.E_theta = (-j*k*eta)*field.E_theta;
+    field.E_phi = (-j*k*eta)*field.E_phi;
+    this->quadl.unset_2d();
+    return field;
+}
+
 void engine_2d_t::unset(){
     this->N = 0;
     this->k = 0.0;
