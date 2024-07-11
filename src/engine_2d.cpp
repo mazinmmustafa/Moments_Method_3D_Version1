@@ -3,6 +3,10 @@
 
 const size_t line_max=100;
 
+const real_t eps_projection=1.0E-4;
+
+#define DEBUG true
+
 struct integrand_2d_args{
     basis_2d_t basis_m, basis_n;
     complex_t k=0.0;
@@ -100,10 +104,20 @@ complex_t integrand_phi_2d_projection(const complex_t alpha_m, const complex_t b
         P0_u = para_mm.para_1d[i].P0_u;
         u = para_mm.u[i];
         d = para_mm.d;
-        A = P0*log((R_p+l_p)/(R_m+l_m));
-        B = atan2(P0*l_p, R0*R0+d*R_p);
-        C = atan2(P0*l_m, R0*R0+d*R_m);
+        A = P0<(eps_projection*lambda) ? 0.0 : P0*log((R_p+l_p)/(R_m+l_m));
+        B = P0<(eps_projection*lambda) ? 0.0 : atan2(P0*l_p, R0*R0+d*R_p);
+        C = P0<(eps_projection*lambda) ? 0.0 : atan2(P0*l_m, R0*R0+d*R_m);
         D = P0_u*u;
+        #ifdef DEBUG
+        if (isnan(A)||isnan(B)||isnan(C)||isnan(D)){
+            print("\n");
+            print(A);
+            print(B);
+            print(C);
+            print(D);
+            assert(0);
+        }
+        #endif
         I_mm+=D*(A-d*(B-C));
         // mp
         R0 = para_mp.R0[i];
@@ -115,10 +129,20 @@ complex_t integrand_phi_2d_projection(const complex_t alpha_m, const complex_t b
         P0_u = para_mp.para_1d[i].P0_u;
         u = para_mp.u[i];
         d = para_mp.d;
-        A = P0*log((R_p+l_p)/(R_m+l_m));
-        B = atan2(P0*l_p, R0*R0+d*R_p);
-        C = atan2(P0*l_m, R0*R0+d*R_m);
+        A = P0<(eps_projection*lambda) ? 0.0 : P0*log((R_p+l_p)/(R_m+l_m));
+        B = P0<(eps_projection*lambda) ? 0.0 : atan2(P0*l_p, R0*R0+d*R_p);
+        C = P0<(eps_projection*lambda) ? 0.0 : atan2(P0*l_m, R0*R0+d*R_m);
         D = P0_u*u;
+        #ifdef DEBUG
+        if (isnan(A)||isnan(B)||isnan(C)||isnan(D)){
+            print("\n");
+            print(A);
+            print(B);
+            print(C);
+            print(D);
+            assert(0);
+        }
+        #endif
         I_mp+=D*(A-d*(B-C));
         // pm
         R0 = para_pm.R0[i];
@@ -130,10 +154,20 @@ complex_t integrand_phi_2d_projection(const complex_t alpha_m, const complex_t b
         P0_u = para_pm.para_1d[i].P0_u;
         u = para_pm.u[i];
         d = para_pm.d;
-        A = P0*log((R_p+l_p)/(R_m+l_m));
-        B = atan2(P0*l_p, R0*R0+d*R_p);
-        C = atan2(P0*l_m, R0*R0+d*R_m);
+        A = P0<(eps_projection*lambda) ? 0.0 : P0*log((R_p+l_p)/(R_m+l_m));
+        B = P0<(eps_projection*lambda) ? 0.0 : atan2(P0*l_p, R0*R0+d*R_p);
+        C = P0<(eps_projection*lambda) ? 0.0 : atan2(P0*l_m, R0*R0+d*R_m);
         D = P0_u*u;
+        #ifdef DEBUG
+        if (isnan(A)||isnan(B)||isnan(C)||isnan(D)){
+            print("\n");
+            print(A);
+            print(B);
+            print(C);
+            print(D);
+            assert(0);
+        }
+        #endif
         I_pm+=D*(A-d*(B-C));        
         // pp
         R0 = para_pp.R0[i];
@@ -145,10 +179,20 @@ complex_t integrand_phi_2d_projection(const complex_t alpha_m, const complex_t b
         P0_u = para_pp.para_1d[i].P0_u;
         u = para_pp.u[i];
         d = para_pp.d;
-        A = P0*log((R_p+l_p)/(R_m+l_m));
-        B = atan2(P0*l_p, R0*R0+d*R_p);
-        C = atan2(P0*l_m, R0*R0+d*R_m);
+        A = P0<(eps_projection*lambda) ? 0.0 : P0*log((R_p+l_p)/(R_m+l_m));
+        B = P0<(eps_projection*lambda) ? 0.0 : atan2(P0*l_p, R0*R0+d*R_p);
+        C = P0<(eps_projection*lambda) ? 0.0 : atan2(P0*l_m, R0*R0+d*R_m);
         D = P0_u*u;
+        #ifdef DEBUG
+        if (isnan(A)||isnan(B)||isnan(C)||isnan(D)){
+            print("\n");
+            print(A);
+            print(B);
+            print(C);
+            print(D);
+            assert(0);
+        }
+        #endif
         I_pp+=D*(A-d*(B-C));
     }   
     return (basis_m.L*basis_n.L/(2.0*pi))*(I_mm/basis_n.A_m-I_mp/basis_n.A_p-I_pm/basis_n.A_m+I_pp/basis_n.A_p);
@@ -229,10 +273,20 @@ complex_t integrand_psi_2d_projection_1(const complex_t alpha_m, const complex_t
         u = para_mm.u[i];
         d = para_mm.d;
         rho_n_m = basis_n.r_m-para_mm.p0[i];
-        A = P0*log((R_p+l_p)/(R_m+l_m));
-        B = atan2(P0*l_p, R0*R0+d*R_p);
-        C = atan2(P0*l_m, R0*R0+d*R_m);
+        A = P0<(eps_projection*lambda) ? 0.0 : P0*log((R_p+l_p)/(R_m+l_m));
+        B = P0<(eps_projection*lambda) ? 0.0 : atan2(P0*l_p, R0*R0+d*R_p);
+        C = P0<(eps_projection*lambda) ? 0.0 : atan2(P0*l_m, R0*R0+d*R_m);
         D = P0_u*u;
+        #ifdef DEBUG
+        if (isnan(A)||isnan(B)||isnan(C)||isnan(D)){
+            print("\n");
+            print(A);
+            print(B);
+            print(C);
+            print(D);
+            assert(0);
+        }
+        #endif
         I_mm+=(rho_m_m*rho_n_m)*D*(A-d*(B-C));
         // mp
         R0 = para_mp.R0[i];
@@ -245,10 +299,20 @@ complex_t integrand_psi_2d_projection_1(const complex_t alpha_m, const complex_t
         u = para_mp.u[i];
         d = para_mp.d;
         rho_n_p = basis_n.r_p-para_mp.p0[i];
-        A = P0*log((R_p+l_p)/(R_m+l_m));
-        B = atan2(P0*l_p, R0*R0+d*R_p);
-        C = atan2(P0*l_m, R0*R0+d*R_m);
+        A = P0<(eps_projection*lambda) ? 0.0 : P0*log((R_p+l_p)/(R_m+l_m));
+        B = P0<(eps_projection*lambda) ? 0.0 : atan2(P0*l_p, R0*R0+d*R_p);
+        C = P0<(eps_projection*lambda) ? 0.0 : atan2(P0*l_m, R0*R0+d*R_m);
         D = P0_u*u;
+        #ifdef DEBUG
+        if (isnan(A)||isnan(B)||isnan(C)||isnan(D)){
+            print("\n");
+            print(A);
+            print(B);
+            print(C);
+            print(D);
+            assert(0);
+        }
+        #endif
         I_mp+=(rho_m_m*rho_n_p)*D*(A-d*(B-C));
         // pm
         R0 = para_pm.R0[i];
@@ -261,10 +325,20 @@ complex_t integrand_psi_2d_projection_1(const complex_t alpha_m, const complex_t
         u = para_pm.u[i];
         d = para_pm.d;
         rho_n_m = basis_n.r_m-para_pm.p0[i];
-        A = P0*log((R_p+l_p)/(R_m+l_m));
-        B = atan2(P0*l_p, R0*R0+d*R_p);
-        C = atan2(P0*l_m, R0*R0+d*R_m);
+        A = P0<(eps_projection*lambda) ? 0.0 : P0*log((R_p+l_p)/(R_m+l_m));
+        B = P0<(eps_projection*lambda) ? 0.0 : atan2(P0*l_p, R0*R0+d*R_p);
+        C = P0<(eps_projection*lambda) ? 0.0 : atan2(P0*l_m, R0*R0+d*R_m);
         D = P0_u*u;
+        #ifdef DEBUG
+        if (isnan(A)||isnan(B)||isnan(C)||isnan(D)){
+            print("\n");
+            print(A);
+            print(B);
+            print(C);
+            print(D);
+            assert(0);
+        }
+        #endif
         I_pm+=(rho_m_p*rho_n_m)*D*(A-d*(B-C));
         // pp
         R0 = para_pp.R0[i];
@@ -277,10 +351,20 @@ complex_t integrand_psi_2d_projection_1(const complex_t alpha_m, const complex_t
         u = para_pp.u[i];
         d = para_pp.d;
         rho_n_p = basis_n.r_p-para_pp.p0[i];
-        A = P0*log((R_p+l_p)/(R_m+l_m));
-        B = atan2(P0*l_p, R0*R0+d*R_p);
-        C = atan2(P0*l_m, R0*R0+d*R_m);
+        A = P0<(eps_projection*lambda) ? 0.0 : P0*log((R_p+l_p)/(R_m+l_m));
+        B = P0<(eps_projection*lambda) ? 0.0 : atan2(P0*l_p, R0*R0+d*R_p);
+        C = P0<(eps_projection*lambda) ? 0.0 : atan2(P0*l_m, R0*R0+d*R_m);
         D = P0_u*u;
+        #ifdef DEBUG
+        if (isnan(A)||isnan(B)||isnan(C)||isnan(D)){
+            print("\n");
+            print(A);
+            print(B);
+            print(C);
+            print(D);
+            assert(0);
+        }
+        #endif
         I_pp+=(rho_m_p*rho_n_p)*D*(A-d*(B-C));
     }   
     return (basis_m.L*basis_n.L/(8.0*pi))*(-I_mm/basis_n.A_m+I_mp/basis_n.A_p-I_pm/basis_n.A_m+I_pp/basis_n.A_p);
@@ -313,9 +397,18 @@ complex_t integrand_psi_2d_projection_2(const complex_t alpha_m, const complex_t
         l_m = para_mm.para_1d[i].l_m;
         l_p = para_mm.para_1d[i].l_p;
         u = para_mm.u[i];
-        A = R0*R0*log((R_p+l_p)/(R_m+l_m));
+        A = R0<(eps_projection*lambda) ? 0.0 : R0*R0*log((R_p+l_p)/(R_m+l_m));
         B = R_p*l_p;
         C = R_m*l_m;
+        #ifdef DEBUG
+        if (isnan(A)||isnan(B)||isnan(C)){
+            print("\n");
+            print(A);
+            print(B);
+            print(C);
+            assert(0);
+        }
+        #endif
         I_mm+=(0.5*rho_m_m*u)*(A+B-C);
         // mp
         R0 = para_mp.R0[i];
@@ -324,9 +417,19 @@ complex_t integrand_psi_2d_projection_2(const complex_t alpha_m, const complex_t
         l_m = para_mp.para_1d[i].l_m;
         l_p = para_mp.para_1d[i].l_p;
         u = para_mp.u[i];
-        A = R0*R0*log((R_p+l_p)/(R_m+l_m));
+        A = R0<(eps_projection*lambda) ? 0.0 : R0*R0*log((R_p+l_p)/(R_m+l_m));
         B = R_p*l_p;
         C = R_m*l_m;
+        #ifdef DEBUG
+        if (isnan(A)||isnan(B)||isnan(C)){
+            print("\n");
+            print(R0);
+            print(A);
+            print(B);
+            print(C);
+            assert(0);
+        }
+        #endif
         I_mp+=(0.5*rho_m_m*u)*(A+B-C);
         // pm
         R0 = para_pm.R0[i];
@@ -335,9 +438,18 @@ complex_t integrand_psi_2d_projection_2(const complex_t alpha_m, const complex_t
         l_m = para_pm.para_1d[i].l_m;
         l_p = para_pm.para_1d[i].l_p;
         u = para_pm.u[i];
-        A = R0*R0*log((R_p+l_p)/(R_m+l_m));
+        A = R0<(eps_projection*lambda) ? 0.0 : R0*R0*log((R_p+l_p)/(R_m+l_m));
         B = R_p*l_p;
         C = R_m*l_m;
+        #ifdef DEBUG
+        if (isnan(A)||isnan(B)||isnan(C)){
+            print("\n");
+            print(A);
+            print(B);
+            print(C);
+            assert(0);
+        }
+        #endif
         I_pm+=(0.5*rho_m_p*u)*(A+B-C);
         // pp
         R0 = para_pp.R0[i];
@@ -346,9 +458,18 @@ complex_t integrand_psi_2d_projection_2(const complex_t alpha_m, const complex_t
         l_m = para_pp.para_1d[i].l_m;
         l_p = para_pp.para_1d[i].l_p;
         u = para_pp.u[i];
-        A = R0*R0*log((R_p+l_p)/(R_m+l_m));
+        A = R0<(eps_projection*lambda) ? 0.0 : R0*R0*log((R_p+l_p)/(R_m+l_m));
         B = R_p*l_p;
         C = R_m*l_m;
+        #ifdef DEBUG
+        if (isnan(A)||isnan(B)||isnan(C)){
+            print("\n");
+            print(A);
+            print(B);
+            print(C);
+            assert(0);
+        }
+        #endif
         I_pp+=(0.5*rho_m_p*u)*(A+B-C);
     }   
     return (basis_m.L*basis_n.L/(8.0*pi))*(I_mm/basis_n.A_m-I_mp/basis_n.A_p+I_pm/basis_n.A_m-I_pp/basis_n.A_p);
@@ -371,6 +492,8 @@ complex_t Z_mn_2d(const basis_2d_t basis_m, const basis_2d_t basis_n, const comp
     complex_t phi=phi_2d(basis_m, basis_n, k, lambda, quadl, flag); if(flag){flag=false; print("warning: no convergence!\n");}
     const complex_t j=complex_t(0.0, 1.0);
     complex_t Z=j*k*eta*psi-j*(eta/k)*phi;
+    assert_error(!isnan(abs(psi)), "nan value for psi");
+    assert_error(!isnan(abs(phi)), "nan value for phi");
     assert_error(!isnan(abs(Z)), "nan value for Z_mn");
     assert_error(!isinf(abs(Z)), "inf value for Z_mn");
     return Z;
@@ -404,6 +527,15 @@ complex_t integrand_V_plane_wave_2d(const complex_t alpha_m, const complex_t bet
     xi_m = basis_m.L*exp(j*k_i_r_m)*(rho_m*phi_i_u);
     xi_p = basis_m.L*exp(j*k_i_r_p)*(rho_p*phi_i_u);
     complex_t I_TE=E_TE*(xi_m+xi_p);
+    #ifdef DEBUG
+    if (isnan(abs(I_TM))||isnan(abs(I_TE))){
+        print(xi_m);
+        print(xi_p);
+        print(E_TM);
+        print(E_TE);
+        assert(false);
+    }
+    #endif
     return I_TM+I_TE;
 }
 
@@ -419,7 +551,7 @@ complex_t V_m_plane_wave_2d(const basis_2d_t basis_m, const complex_t E_TM, cons
     args.phi_i = phi_i;
     triangle_domain_t triangle={vector_t<real_t>(0.0, 0.0, 0.0), vector_t<real_t>(1.0, 0.0, 0.0), vector_t<real_t>(0.0, 1.0, 0.0)};
     complex_t I_V=quadl.integral_2d(integrand_V_plane_wave_2d, &args, triangle, flag);
-    if(flag){flag=false; print("warning: no convergence!\n");}
+    assert_error(!isnan(abs(I_V)), "nan value for I_V");
     return I_V;
 }
 
@@ -608,15 +740,17 @@ complex_t integrand_RCS_phi_2d(const complex_t alpha_n, const complex_t beta_n, 
 
 // engine
 
-void  engine_2d_t::set_medium(const complex_t mu, const complex_t eps, const real_t freq){
+void  engine_2d_t::set_medium(const complex_t mu, const complex_t eps, const real_t freq,
+    const real_t unit_length){
     this->shape.set_medium(mu, eps, freq);
+    this->unit_length = unit_length;
 }
 
 void engine_2d_t::mesh(const char *filename, const real_t clmax){
     assert_error(this->is_mesh_obtained==false, "mesh already exists");
-    this->shape.mesh_2d(filename, clmax);
+    this->shape.mesh_2d(filename, clmax/unit_length);
     this->shape.get_mesh();
-    this->shape.get_basis_functions();
+    this->shape.get_basis_functions(unit_length);
     this->shape.load_basis_functions();
     //
     shape_info_t shape_info=this->shape.get_shape_info();
@@ -702,6 +836,28 @@ void engine_2d_t::compute_V_m_plane_wave(const complex_t E_TM, const complex_t E
     for (size_t m=0; m<N; m++){
         basis_m = this->shape.get_basis_2d(m);
         this->V_m(m, 0) = V_m_plane_wave_2d(basis_m, E_TM, E_TE, k, theta_i, phi_i, this->quadl);
+        count++;
+    }
+    this->quadl.unset_2d();
+    this->is_V_m_available = true;
+}
+
+void engine_2d_t::compute_port_excitation(const int_t index, const complex_t V, 
+    const real_t l, const real_t E_theta, const real_t E_phi, 
+    const real_t theta, const real_t phi){
+    this->shape.check();
+    this->quadl.set_2d(k_max, tol);
+    basis_2d_t basis_m;
+    size_t count=0;
+    complex_t E0=(V/l);
+    for (size_t m=0; m<N; m++){
+        basis_m = this->shape.get_basis_2d(m);
+        if ((basis_m.physical_group_m==index)&&(basis_m.physical_group_p==index)){
+            this->V_m(m, 0) = V_m_plane_wave_2d(basis_m, E0*E_theta, E0*E_phi, k, theta, phi, this->quadl);
+        }else{
+            this->V_m(m, 0) = 0.0;
+        }
+        E0 = (V/l)/E0;
         count++;
     }
     this->quadl.unset_2d();
@@ -843,6 +999,9 @@ void engine_2d_t::export_currents(){
         file2.read("%lf %lf %lf %d\n", &triangles_list[i].v[1].x, &triangles_list[i].v[1].y, &triangles_list[i].v[1].z, &dummy2);
         file2.read("%lf %lf %lf %d\n", &triangles_list[i].v[2].x, &triangles_list[i].v[2].y, &triangles_list[i].v[2].z, &dummy3);
         file2.read("\n");
+        triangles_list[i].v[0] = triangles_list[i].v[0]*this->unit_length;
+        triangles_list[i].v[1] = triangles_list[i].v[1]*this->unit_length;
+        triangles_list[i].v[2] = triangles_list[i].v[2]*this->unit_length;
     }
     file2.close();
     //
@@ -864,7 +1023,7 @@ void engine_2d_t::export_currents(){
                     if (is_equal(triangle.v[ii], triangle_.v[jj], tol*this->lambda)){
                         count++;
                     }
-                    if (count==2){
+                    if (count==3){
                         J = J+(alpha*basis_n.L_m1+beta*basis_n.L_m2)*this->I_n(n, 0);
                         count = 0;
                         break;
@@ -879,7 +1038,7 @@ void engine_2d_t::export_currents(){
                     if (is_equal(triangle.v[ii], triangle_.v[jj], tol*this->lambda)){
                         count++;
                     }
-                    if (count==2){
+                    if (count==3){
                         J = J-(alpha*basis_n.L_p1+beta*basis_n.L_p2)*this->I_n(n, 0);
                         count = 0;
                         break;

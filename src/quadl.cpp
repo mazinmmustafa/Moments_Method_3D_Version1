@@ -1,7 +1,7 @@
 //
 #include "quadl.hpp"
 
-const real_t eps_zero=1.0E-14;
+const real_t eps_zero=1.0E-20;
 
 size_t max_size_t(const size_t a, const size_t b){
     return a>b ? a : b;

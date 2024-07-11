@@ -18,6 +18,7 @@ int main(){
     // test_near_field_heat_map_2d();
     // test_current_2d();
     // test_far_field_2d();
+    test_far_field_antenna_2d();
 
     return 0;
 }

@@ -240,7 +240,7 @@ size_t mod_3d(const size_t a){
     return ans==6 ? 0 : ans;
 }
 
-void shape_t::get_basis_functions(){
+void shape_t::get_basis_functions(const real_t unit_length){
     assert_error(this->is_triangle_allocated, "no 2d shape elements were found");
     assert_error(!this->is_basis_2d_list_allocated, "2d basis functions were already allocated");
     file_t file;
@@ -252,45 +252,47 @@ void shape_t::get_basis_functions(){
     size_t index_edge_d;
     for (size_t i=0; i<this->N_edges; i++){
         edge_s = this->edge_data[i];
-        for (size_t j=(i+1); j<this->N_edges; j++){
-            edge_d = this->edge_data[j];
-            // 
-            size_t count=0;
-            index_edge_s = 0;
-            index_edge_d = 0;
-            for (size_t ii=0; ii<2; ii++){
-                for (size_t jj=0; jj<2; jj++){
-                    if (is_equal(edge_s.v[ii], edge_d.v[jj], this->lambda*tol_vertex)){
-                        new_edge[count] = ii;
-                        index_edge_s+=ii;
-                        index_edge_d+=jj;
-                        count++;
-                        if (count==1){
-                            break;
+        if (edge_s.physical_group>0){
+            for (size_t j=(i+1); j<this->N_edges; j++){
+                edge_d = this->edge_data[j];
+                // 
+                size_t count=0;
+                index_edge_s = 0;
+                index_edge_d = 0;
+                for (size_t ii=0; ii<2; ii++){
+                    for (size_t jj=0; jj<2; jj++){
+                        if (is_equal(edge_s.v[ii], edge_d.v[jj], this->lambda*tol_vertex/unit_length)){
+                            new_edge[count] = ii;
+                            index_edge_s+=ii;
+                            index_edge_d+=jj;
+                            count++;
+                            if (count==1){
+                                break;
+                            }
                         }
                     }
                 }
-            }
-            if (count==1){
-                index_edge_s = mod_1d(index_edge_s);
-                index_edge_d = mod_1d(index_edge_d);
-                file.write("%21.14E %21.14E %21.14E ", 
-                    edge_s.v[index_edge_s].x,
-                    edge_s.v[index_edge_s].y,
-                    edge_s.v[index_edge_s].z);
-                file.write("%21.14E %21.14E %21.14E ", 
-                    edge_s.v[new_edge[0]].x,
-                    edge_s.v[new_edge[0]].y,
-                    edge_s.v[new_edge[0]].z);
-                file.write("%21.14E %21.14E %21.14E ", 
-                    edge_d.v[index_edge_d].x,
-                    edge_d.v[index_edge_d].y,
-                    edge_d.v[index_edge_d].z);
-                file.write("%d %d\n", edge_s.physical_group, edge_d.physical_group);
-                count = 0;
-                edge_s.N_adjacents++;
-                edge_d.N_adjacents++;
-                this->N_1d_basis++;
+                if (count==1&&edge_d.physical_group>0){
+                    index_edge_s = mod_1d(index_edge_s);
+                    index_edge_d = mod_1d(index_edge_d);
+                    file.write("%21.14E %21.14E %21.14E ", 
+                        edge_s.v[index_edge_s].x*unit_length,
+                        edge_s.v[index_edge_s].y*unit_length,
+                        edge_s.v[index_edge_s].z*unit_length);
+                    file.write("%21.14E %21.14E %21.14E ", 
+                        edge_s.v[new_edge[0]].x*unit_length,
+                        edge_s.v[new_edge[0]].y*unit_length,
+                        edge_s.v[new_edge[0]].z*unit_length);
+                    file.write("%21.14E %21.14E %21.14E ", 
+                        edge_d.v[index_edge_d].x*unit_length,
+                        edge_d.v[index_edge_d].y*unit_length,
+                        edge_d.v[index_edge_d].z*unit_length);
+                    file.write("%d %d\n", edge_s.physical_group, edge_d.physical_group);
+                    count = 0;
+                    edge_s.N_adjacents++;
+                    edge_d.N_adjacents++;
+                    this->N_1d_basis++;
+                }
             }
         }
     }
@@ -303,49 +305,51 @@ void shape_t::get_basis_functions(){
     size_t index_triangle_d;
     for (size_t i=0; i<this->N_triangles; i++){
         triangle_s = this->triangle_data[i];
-        for (size_t j=(i+1); j<this->N_triangles; j++){
-            triangle_d = this->triangle_data[j];
-            // 
-            size_t count=0;
-            index_triangle_s = 0;
-            index_triangle_d = 0;
-            for (size_t ii=0; ii<3; ii++){
-                for (size_t jj=0; jj<3; jj++){
-                    if (is_equal(triangle_s.v[ii], triangle_d.v[jj], this->lambda*tol_vertex)){
-                        new_triangle[count] = ii;
-                        index_triangle_s+=ii;
-                        index_triangle_d+=jj;
-                        count++;
-                        if (count==2){
-                            break;
+        if (triangle_s.physical_group>0){
+            for (size_t j=(i+1); j<this->N_triangles; j++){
+                triangle_d = this->triangle_data[j];
+                // 
+                size_t count=0;
+                index_triangle_s = 0;
+                index_triangle_d = 0;
+                for (size_t ii=0; ii<3; ii++){
+                    for (size_t jj=0; jj<3; jj++){
+                        if (is_equal(triangle_s.v[ii], triangle_d.v[jj], this->lambda*tol_vertex/unit_length)){
+                            new_triangle[count] = ii;
+                            index_triangle_s+=ii;
+                            index_triangle_d+=jj;
+                            count++;
+                            if (count==2){
+                                break;
+                            }
                         }
                     }
                 }
-            }
-            if (count==2){
-                index_triangle_s = mod_2d(index_triangle_s);
-                index_triangle_d = mod_2d(index_triangle_d);
-                file.write("%21.14E %21.14E %21.14E ", 
-                    triangle_s.v[index_triangle_s].x,
-                    triangle_s.v[index_triangle_s].y,
-                    triangle_s.v[index_triangle_s].z);
-                file.write("%21.14E %21.14E %21.14E ", 
-                    triangle_s.v[new_triangle[0]].x,
-                    triangle_s.v[new_triangle[0]].y,
-                    triangle_s.v[new_triangle[0]].z);
-                file.write("%21.14E %21.14E %21.14E ", 
-                    triangle_s.v[new_triangle[1]].x,
-                    triangle_s.v[new_triangle[1]].y,
-                    triangle_s.v[new_triangle[1]].z);
-                file.write("%21.14E %21.14E %21.14E ", 
-                    triangle_d.v[index_triangle_d].x,
-                    triangle_d.v[index_triangle_d].y,
-                    triangle_d.v[index_triangle_d].z);
-                file.write("%d %d\n", triangle_s.physical_group, triangle_d.physical_group);
-                count = 0;
-                triangle_s.N_adjacents++;
-                triangle_d.N_adjacents++;
-                this->N_2d_basis++;
+                if (count==2&&triangle_d.physical_group>0){
+                    index_triangle_s = mod_2d(index_triangle_s);
+                    index_triangle_d = mod_2d(index_triangle_d);
+                    file.write("%21.14E %21.14E %21.14E ", 
+                        triangle_s.v[index_triangle_s].x*unit_length,
+                        triangle_s.v[index_triangle_s].y*unit_length,
+                        triangle_s.v[index_triangle_s].z*unit_length);
+                    file.write("%21.14E %21.14E %21.14E ", 
+                        triangle_s.v[new_triangle[0]].x*unit_length,
+                        triangle_s.v[new_triangle[0]].y*unit_length,
+                        triangle_s.v[new_triangle[0]].z*unit_length);
+                    file.write("%21.14E %21.14E %21.14E ", 
+                        triangle_s.v[new_triangle[1]].x*unit_length,
+                        triangle_s.v[new_triangle[1]].y*unit_length,
+                        triangle_s.v[new_triangle[1]].z*unit_length);
+                    file.write("%21.14E %21.14E %21.14E ", 
+                        triangle_d.v[index_triangle_d].x*unit_length,
+                        triangle_d.v[index_triangle_d].y*unit_length,
+                        triangle_d.v[index_triangle_d].z*unit_length);
+                    file.write("%d %d\n", triangle_s.physical_group, triangle_d.physical_group);
+                    count = 0;
+                    triangle_s.N_adjacents++;
+                    triangle_d.N_adjacents++;
+                    this->N_2d_basis++;
+                }
             }
         }
     }
@@ -358,53 +362,55 @@ void shape_t::get_basis_functions(){
     size_t index_tetrahedron_d;
     for (size_t i=0; i<this->N_tetrahedrons; i++){
         tetrahedron_s = this->tetrahedron_data[i];
-        for (size_t j=(i+1); j<this->N_tetrahedrons; j++){
-            tetrahedron_d = this->tetrahedron_data[j];
-            // 
-            size_t count=0;
-            index_tetrahedron_s = 0;
-            index_tetrahedron_d = 0;
-            for (size_t ii=0; ii<4; ii++){
-                for (size_t jj=0; jj<4; jj++){
-                    if (is_equal(tetrahedron_s.v[ii], tetrahedron_d.v[jj], this->lambda*tol_vertex)){
-                        new_tetrahedron[count] = ii;
-                        index_tetrahedron_s+=ii;
-                        index_tetrahedron_d+=jj;
-                        count++;
-                        if (count==3){
-                            break;
+        if (tetrahedron_s.physical_group>0){
+            for (size_t j=(i+1); j<this->N_tetrahedrons; j++){
+                tetrahedron_d = this->tetrahedron_data[j];
+                // 
+                size_t count=0;
+                index_tetrahedron_s = 0;
+                index_tetrahedron_d = 0;
+                for (size_t ii=0; ii<4; ii++){
+                    for (size_t jj=0; jj<4; jj++){
+                        if (is_equal(tetrahedron_s.v[ii], tetrahedron_d.v[jj], this->lambda*tol_vertex/unit_length)){
+                            new_tetrahedron[count] = ii;
+                            index_tetrahedron_s+=ii;
+                            index_tetrahedron_d+=jj;
+                            count++;
+                            if (count==3){
+                                break;
+                            }
                         }
                     }
                 }
-            }
-            if (count==3){
-                index_tetrahedron_s = mod_3d(index_tetrahedron_s);
-                index_tetrahedron_d = mod_3d(index_tetrahedron_d);
-                file.write("%21.14E %21.14E %21.14E ", 
-                    tetrahedron_s.v[index_tetrahedron_s].x,
-                    tetrahedron_s.v[index_tetrahedron_s].y,
-                    tetrahedron_s.v[index_tetrahedron_s].z);
-                file.write("%21.14E %21.14E %21.14E ", 
-                    tetrahedron_s.v[new_tetrahedron[0]].x,
-                    tetrahedron_s.v[new_tetrahedron[0]].y,
-                    tetrahedron_s.v[new_tetrahedron[0]].z);
-                file.write("%21.14E %21.14E %21.14E ", 
-                    tetrahedron_s.v[new_tetrahedron[1]].x,
-                    tetrahedron_s.v[new_tetrahedron[1]].y,
-                    tetrahedron_s.v[new_tetrahedron[1]].z);
-                file.write("%21.14E %21.14E %21.14E ", 
-                    tetrahedron_s.v[new_tetrahedron[2]].x,
-                    tetrahedron_s.v[new_tetrahedron[2]].y,
-                    tetrahedron_s.v[new_tetrahedron[2]].z);
-                file.write("%21.14E %21.14E %21.14E ", 
-                    tetrahedron_d.v[index_tetrahedron_d].x,
-                    tetrahedron_d.v[index_tetrahedron_d].y,
-                    tetrahedron_d.v[index_tetrahedron_d].z);
-                file.write("%d %d\n", tetrahedron_s.physical_group, tetrahedron_d.physical_group);
-                count = 0;
-                tetrahedron_s.N_adjacents++;
-                tetrahedron_d.N_adjacents++;
-                this->N_3d_basis++;
+                if (count==3&&tetrahedron_d.physical_group>0){
+                    index_tetrahedron_s = mod_3d(index_tetrahedron_s);
+                    index_tetrahedron_d = mod_3d(index_tetrahedron_d);
+                    file.write("%21.14E %21.14E %21.14E ", 
+                        tetrahedron_s.v[index_tetrahedron_s].x*unit_length,
+                        tetrahedron_s.v[index_tetrahedron_s].y*unit_length,
+                        tetrahedron_s.v[index_tetrahedron_s].z*unit_length);
+                    file.write("%21.14E %21.14E %21.14E ", 
+                        tetrahedron_s.v[new_tetrahedron[0]].x*unit_length,
+                        tetrahedron_s.v[new_tetrahedron[0]].y*unit_length,
+                        tetrahedron_s.v[new_tetrahedron[0]].z*unit_length);
+                    file.write("%21.14E %21.14E %21.14E ", 
+                        tetrahedron_s.v[new_tetrahedron[1]].x*unit_length,
+                        tetrahedron_s.v[new_tetrahedron[1]].y*unit_length,
+                        tetrahedron_s.v[new_tetrahedron[1]].z*unit_length);
+                    file.write("%21.14E %21.14E %21.14E ", 
+                        tetrahedron_s.v[new_tetrahedron[2]].x*unit_length,
+                        tetrahedron_s.v[new_tetrahedron[2]].y*unit_length,
+                        tetrahedron_s.v[new_tetrahedron[2]].z*unit_length);
+                    file.write("%21.14E %21.14E %21.14E ", 
+                        tetrahedron_d.v[index_tetrahedron_d].x*unit_length,
+                        tetrahedron_d.v[index_tetrahedron_d].y*unit_length,
+                        tetrahedron_d.v[index_tetrahedron_d].z*unit_length);
+                    file.write("%d %d\n", tetrahedron_s.physical_group, tetrahedron_d.physical_group);
+                    count = 0;
+                    tetrahedron_s.N_adjacents++;
+                    tetrahedron_d.N_adjacents++;
+                    this->N_3d_basis++;
+                }
             }
         }
     }

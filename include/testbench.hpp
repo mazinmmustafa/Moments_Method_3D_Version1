@@ -30,5 +30,6 @@ void test_near_field_2d();
 void test_near_field_heat_map_2d();
 void test_current_2d();
 void test_far_field_2d();
+void test_far_field_antenna_2d();
 
 #endif

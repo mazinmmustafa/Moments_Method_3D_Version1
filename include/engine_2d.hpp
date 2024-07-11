@@ -35,6 +35,7 @@ class engine_2d_t{
         int is_I_n_available=false;
         int is_mesh_obtained=false;
     public:
+        real_t unit_length=1.0;
         shape_t shape;
         size_t N=0;
         complex_t k=0.0, eta=0.0;
@@ -52,7 +53,8 @@ class engine_2d_t{
         field_2d_t compute_far_field(const real_t theta_s, const real_t phi_s);
         //
         size_t get_N(){return this->N;}
-        void set_medium(const complex_t mu, const complex_t eps, const real_t freq);
+        void set_medium(const complex_t mu, const complex_t eps, const real_t freq, 
+            const real_t unit_length);
         void mesh(const char *filename, const real_t clmax);
         void solve_currents();
         void unset();
@@ -62,6 +64,9 @@ class engine_2d_t{
         field_2d_t compute_incident_plane_wave_field(const real_t theta_i, const real_t phi_i,
             const complex_t E_TM, const complex_t E_TE, const vector_t<real_t> p);
         void export_currents();
+        void compute_port_excitation(const int_t index, const complex_t V, 
+            const real_t l, const real_t E_theta, const real_t E_phi, 
+            const real_t theta, const real_t phi);
 };
 
 // Functions
