@@ -871,7 +871,7 @@ void test_far_field_antenna_2d(){
 
     // medium parameters
     const real_t GHz=1.0E+9;
-    real_t freq=20.0*GHz;
+    real_t freq=6.0*GHz;
     real_t mu=1.0, eps=1.0;
     const real_t mm=1.0E-3;
     const real_t l_subs=1.52*mm;
@@ -888,9 +888,9 @@ void test_far_field_antenna_2d(){
     engine.shape.assign_volume_properties(eps_r, 1);
 
     //// find Z_mn
-    // timer.set();
-    // engine.compute_Z_mn();
-    // timer.unset();
+    timer.set();
+    engine.compute_Z_mn();
+    timer.unset();
 
     field_2d_t field;
     file_t file;
